@@ -137,7 +137,6 @@ public class FileIO {
 		try {
 			// initialize file and create values
 			BufferedReader in = new BufferedReader(new FileReader(name+".txt"));
-			int id = 0;
 			int numStates = 0;
 			int numObservations = 0;
 			double defaultprobability = 0;
