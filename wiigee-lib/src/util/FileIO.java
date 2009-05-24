@@ -48,18 +48,11 @@ public class FileIO {
 		try {
 			// initialize file and get values
 			BufferedWriter out = new BufferedWriter(new FileWriter(name+".txt"));
-			int id = m.getId();
 			int numStates = m.getNumStates();
 			int numObservations = m.getNumObservations();
 			double defaultProbability = m.getDefaultProbability();
 			Quantizer quantizer = m.getQuantizer();
 			HMM hmm = m.getHMM();
-			
-			// write to file
-			out.write("# ID:");
-			out.newLine();
-			out.write(Integer.toString(id));
-			out.newLine();
 			
 			out.write("# numStates:");
 			out.newLine();
@@ -161,21 +154,18 @@ public class FileIO {
 				if(!line.startsWith("#")) { // isn't a comment
 					switch (position++) {
 					case 0:
-						id = Integer.parseInt(line);
-						break;
-					case 1:
 						numStates = Integer.parseInt(line);
 						break;
-					case 2:
+					case 1:
 						numObservations = Integer.parseInt(line);
 						break;
-					case 3:
+					case 2:
 						defaultprobability = Double.parseDouble(line);
 						break;
-					case 4:
+					case 3:
 						radius = Double.parseDouble(line);
 						break;
-					case 5:
+					case 4:
 						map = new double[numObservations][3];
 						for(int i=0; i<numObservations; i++) {
 							String s[] = line.split(", ");
@@ -186,14 +176,14 @@ public class FileIO {
 							line = in.ready() ? in.readLine() : "";
 						}
 						break;
-					case 6:
+					case 5:
 						pi = new double[numStates];
 						String pi_row[] = line.split(", ");
 						for(int i=0; i<numStates; i++) {
 							pi[i] = Double.parseDouble(pi_row[i]);
 						}
 						break;
-					case 7:
+					case 6:
 						a = new double[numStates][numStates];
 						for(int i=0; i<numStates; i++) {
 							String a_row[] = line.split(", ");
@@ -203,7 +193,7 @@ public class FileIO {
 							line = in.ready() ? in.readLine() : "";
 						}
 						break;
-					case 8:
+					case 7:
 						b = new double[numStates][numObservations];
 						for(int i=0; i<numStates; i++) {
 							String b_row[] = line.split(", ");
@@ -220,7 +210,7 @@ public class FileIO {
 				}
 			}
 			
-			GestureModel ret = new GestureModel(id);
+			GestureModel ret = new GestureModel();
 			ret.setDefaultProbability(defaultprobability);
 			
 			Quantizer quantizer = new Quantizer(numStates);

@@ -122,7 +122,7 @@ public class TriggeredProcessingUnit extends ProcessingUnit {
 				this.fireStateEvent(1);
 				this.learning=true;
 				
-				GestureModel m = new GestureModel(this.gesturecount++);
+				GestureModel m = new GestureModel();
 				m.train(this.trainsequence);
 				m.print();
 				this.classifier.addGestureModel(m);
@@ -154,7 +154,7 @@ public class TriggeredProcessingUnit extends ProcessingUnit {
 		else if(this.analyzing) { // button release and state=analyzing, stops analyzing
 			if(this.current.getCountOfData()>0) {
 				System.out.println("Finished recording (recognition)...");
-				System.out.println("Compare gesture with "+this.gesturecount+" other gestures.");
+				System.out.println("Compare gesture with "+this.classifier.getCountOfGestures()+" other gestures.");
 				Gesture gesture = new Gesture(this.current);
 				
 				int recognized = this.classifier.classifyGesture(gesture);
@@ -182,15 +182,14 @@ public class TriggeredProcessingUnit extends ProcessingUnit {
 	}
 
 	@Override
-	public void loadGesture(String name) {
-		this.gesturecount++;
-		GestureModel g = util.FileIO.readFromFile(name);
+	public void loadGesture(String filename) {
+		GestureModel g = util.FileIO.readFromFile(filename);
 		this.classifier.addGestureModel(g);	
 	}
 
 	@Override
-	public void saveGesture(int id, String name) {
-		util.FileIO.writeToFile(this.classifier.getGestureModel(id), name);		
+	public void saveGesture(int id, String filename) {
+		util.FileIO.writeToFile(this.classifier.getGestureModel(id), filename);
 	}
 
 }

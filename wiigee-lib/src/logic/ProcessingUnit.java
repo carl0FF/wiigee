@@ -21,11 +21,9 @@ public abstract class ProcessingUnit implements DeviceListener {
 	// Listener
 	private Vector<GestureListener> listen = new Vector<GestureListener>();
 	
-	protected int gesturecount;
 	
 	public ProcessingUnit() {
 		this.classifier = new Classifier();
-		this.gesturecount=0;
 	}
 	
 	/** 
@@ -69,7 +67,7 @@ public abstract class ProcessingUnit implements DeviceListener {
 	 * to the system.
 	 */
 	public void reset() {
-		if(this.gesturecount>0) {
+		if(this.classifier.getCountOfGestures()>0) {
 			this.classifier.clear();
 			System.out.println("### Model reset ###");
 		} else {
@@ -78,8 +76,8 @@ public abstract class ProcessingUnit implements DeviceListener {
 	}
 	
 	// File IO
-	public abstract void loadGesture(String name);
+	public abstract void loadGesture(String filename);
 	
-	public abstract void saveGesture(int id, String name);
+	public abstract void saveGesture(int id, String filename);
 	
 }

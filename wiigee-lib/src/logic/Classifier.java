@@ -96,6 +96,10 @@ public class Classifier {
 	public Vector<GestureModel> getGestureModels() {
 		return this.gesturemodel;
 	}
+
+    public int getCountOfGestures() {
+        return this.gesturemodel.size();
+    }
 	
 	public void clear() {
 		this.gesturemodel = new Vector<GestureModel>();

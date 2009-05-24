@@ -27,7 +27,6 @@ package device;
 import java.io.IOException;
 import java.util.Vector;
 
-import logic.ProcessingUnit;
 import logic.*;
 import event.*;
 import filter.DirectionalEquivalenceFilter;
@@ -53,13 +52,13 @@ public class Device {
 	
 	// Listeners, receive generated events
 	protected Vector<DeviceListener> devicelistener = new Vector<DeviceListener>();
-	protected ProcessingUnit analyzer = new TriggeredProcessingUnit();
+	protected ProcessingUnit processingunit = new TriggeredProcessingUnit();
 	
 	public Device() {
 		this.addFilter(new IdleStateFilter());
 		this.addFilter(new MotionDetectFilter(this));
 		this.addFilter(new DirectionalEquivalenceFilter());
-		this.addDeviceListener(this.analyzer);
+		this.addDeviceListener(this.processingunit);
 	}
 	
 	/**
@@ -98,7 +97,7 @@ public class Device {
 	 * this gesture.
 	 */
 	public void addGestureListener(GestureListener listener) {
-		this.analyzer.addGestureListener(listener);
+		this.processingunit.addGestureListener(listener);
 		System.out.println("GestureListener added...");
 	}
 	
@@ -126,8 +125,8 @@ public class Device {
 		this.closegesturebutton=b;
 	}
 
-	public ProcessingUnit getAccelerationStreamAnalyzer() {
-		return this.analyzer;
+	public ProcessingUnit getProcessingUnit() {
+		return this.processingunit;
 	}
 	
 	public boolean accelerationEnabled() {
@@ -141,6 +140,14 @@ public class Device {
 	public void disableAccelerationSensors() throws IOException {
 		this.accelerationenabled=false;
 	}
+
+    public void loadGesture(String filename) {
+        this.processingunit.loadGesture(filename);
+    }
+
+    public void saveGesture(int id, String filename) {
+        this.processingunit.saveGesture(id, filename);
+    }
 	
 	// ###### Event-Methoden
 	

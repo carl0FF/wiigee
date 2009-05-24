@@ -42,9 +42,6 @@ public class GestureModel {
 	/** The number of observations for the hmm and k-mean */
 	private int numObservations;
 	
-	/** The id representation of this model */
-	private int id;
-
 	/** The quantization component */
 	private Quantizer quantizer;
 	
@@ -61,8 +58,7 @@ public class GestureModel {
 	 * @param id
 	 *  int representation of a gesture "name"/class.
 	 */
-	public GestureModel(int id) {
-		this.id=id;
+	public GestureModel() {
 		this.numStates=8; // n=8 states empirical value
 		this.numObservations=14; // k=14 observations empirical value
 		this.markovmodell = new HMM(numStates, numObservations); // init model
@@ -133,7 +129,7 @@ public class GestureModel {
 	 * For debug purposes or very technical interested people. :)
 	 */
 	public void printMap() {
-		System.out.println("Gesture "+this.id+" Quantizer-Map:");
+		System.out.println("Gesture Quantizer-Map:");
 		this.quantizer.printMap();
 	}
 	
@@ -142,19 +138,10 @@ public class GestureModel {
 	 * @return
 	 */
 	public void print() {
-		System.out.println("Debug Output for Gesture "+this.id);
 		System.out.println("HMM-Print:");
 		this.markovmodell.print();
 		System.out.println("Quanzizer-Print:");
 		this.quantizer.printMap();
-	}
-
-	public int getId() {
-		return this.id;
-	}
-	
-	public void setId(int id) {
-		this.id=id;
 	}
 	
 	public int getNumStates() {

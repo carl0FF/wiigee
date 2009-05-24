@@ -21,12 +21,14 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
 package control;
 
 import java.io.IOException;
 import java.util.Vector;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.bluetooth.BluetoothStateException;
 import javax.bluetooth.DiscoveryAgent;
 import javax.bluetooth.LocalDevice;
 
@@ -38,151 +40,157 @@ import filter.Filter;
 
 // Singleton
 public class WiimoteWiigee {
-	
-	protected static String version = "1.3.1 alpha";
-	protected static String releasedate = "20081215";
-	
-	protected static WiimoteWiigee instance;
-	private static Object lock = new Object();
-	private Vector<Wiimote> devices;
-	
-	private WiimoteWiigee() throws IOException {
-		Log.write("This is wiigee version "+version+" ("+releasedate+")");
-		this.devices=this.discoverWiimotes();
-		for(int i=0; i<this.devices.size(); i++) {
-			this.devices.elementAt(i).setLED(i+1);
-		}
-	}
-	
-	private WiimoteWiigee(String btaddr) throws IOException {
-		Log.write("This is wiigee version "+version+" ("+releasedate+")");
-		this.devices = new Vector<Wiimote>();
-		this.devices.add(new Wiimote(btaddr));
-		for(int i=0; i<this.devices.size(); i++) {
-			this.devices.elementAt(i).setLED(i+1);
-		}
-	}
-	
-	public static WiimoteWiigee getInstance() throws IOException {
-		if(instance==null) {
-			instance=new WiimoteWiigee();
-			return instance;
-		} else {
-			return instance;
-		}
-	}
 
-	public static WiimoteWiigee getInstance(String btaddr) throws IOException {
-		if(instance==null) {
-			instance=new WiimoteWiigee(btaddr);
-			return instance;
-		} else {
-			return instance;
-		}
-	}
-	
-	/**
-	 * Returns an array of discovered wiimotes.
-	 * 
-	 * @return Array of discovered wiimotes or null if
-	 * none discoverd.
-	 */
-	public Wiimote[] getDevices() {
-		Wiimote[] out = new Wiimote[this.devices.size()];
-		for(int i=0; i<this.devices.size(); i++) {
-			out[i] = this.devices.elementAt(i);
-		}
-		return out;
-	}
-	
-	/**
-	 * Discover the wiimotes around the bluetooth host and
-	 * make them available public via getWiimotes method.
-	 * 
-	 * @return Array of discovered wiimotes.
-	 */
-	private Vector<Wiimote> discoverWiimotes() throws IOException {
-			WiimoteDeviceDiscovery deviceDiscovery = new WiimoteDeviceDiscovery(lock);
-			LocalDevice localDevice = LocalDevice.getLocalDevice();
-			Log.write("Your Computers Bluetooth MAC: "+localDevice.getBluetoothAddress());
-			
-			DiscoveryAgent discoveryAgent = localDevice.getDiscoveryAgent();
-			
-			Log.write("Starting device inquiry...");
-			discoveryAgent.startInquiry(DiscoveryAgent.GIAC, deviceDiscovery);
-			
-			
-			try {
-				synchronized(lock){
-					lock.wait();
-				}
-		    } catch (InterruptedException e) {
-		    		Log.write("Problems during device discovery.");
-			        e.printStackTrace();
-			}
+    protected static String version = "1.5 alpha";
+    protected static String releasedate = "20090524";
+    protected static WiimoteWiigee instance;
+    private static Object lock = new Object();
+    private Vector<Wiimote> devices;
 
-		    Log.write("Device discovery completed!");			
-			return deviceDiscovery.getDiscoveredWiimotes();
-	}
-	
-	/**
-	 * Returns the number of wiimotes discovered.
-	 * 
-	 * @return Number of wiimotes discovered.
-	 */
-	public int getNumberOfDevices() {
-		return this.devices.size();
-	}
-	
-	/**
-	 * Sets the Trainbutton for all wiimotes;
-	 * 
-	 * @param b Button encoding, see static Wiimote values
-	 */
-	public void setTrainButton(int b) {
-		for(int i=0; i<this.devices.size(); i++) {
-			this.devices.elementAt(i).setTrainButton(b);
-		}
-	}
-	
-	/**
-	 * Sets the Recognitionbutton for all wiimotes;
-	 * 
-	 * @param b Button encoding, see static Wiimote values
-	 */
-	public void setRecognitionButton(int b) {
-		for(int i=0; i<this.devices.size(); i++) {
-			this.devices.elementAt(i).setRecognitionButton(b);
-		}
-	}
-	
-	/**
-	 * Sets the CloseGesturebutton for all wiimotes;
-	 * 
-	 * @param b Button encoding, see static Wiimote values
-	 */
-	public void setCloseGestureButton(int b) {
-		for(int i=0; i<this.devices.size(); i++) {
-			this.devices.elementAt(i).setCloseGestureButton(b);
-		}
-	}
-	
-	public void addDeviceListener(DeviceListener listener) {
-		if(this.devices.size()>0) {
-			this.devices.elementAt(0).addDeviceListener(listener);
-		}
-	}
-	
-	public void addGestureListener(GestureListener listener) {
-		if(this.devices.size()>0) {
-			this.devices.elementAt(0).addGestureListener(listener);
-		}
-	}
-	
-	public void addFilter(Filter filter) {
-		if(this.devices.size()>0) {
-			this.devices.elementAt(0).addFilter(filter);
-		}
-	}
+    private WiimoteWiigee() {
+        String stack;
+        String stackVersion;
+        String l2capFeature;
+        String bluecoveVersion;
 
+        Log.write("This is wiigee version " + version + " (" + releasedate + ")");
+
+        // Bluecove
+        bluecoveVersion = LocalDevice.getProperty("bluecove");
+        if(!bluecoveVersion.equals("")) {
+
+            stack = LocalDevice.getProperty("bluecove.stack");
+            stackVersion = LocalDevice.getProperty("bluecove.stack.version");
+            Log.write("You are using the "+stack+" Bluetooth stack (Version "+stackVersion+")");
+
+            l2capFeature = LocalDevice.getProperty("bluecove.feature.l2cap");
+            Log.write("L2CAP supported: "+l2capFeature);
+
+            if(l2capFeature.equals("true")) {
+                Log.write("wiigee: found a supported stack!");
+
+                // set min id for Bluecove
+                Log.write(Log.DEBUG, "JSR82 PSM Minimum Restriction -- OFF", null);
+                System.setProperty("bluecove.jsr82.psm_minimum_off", "true");
+            }
+        } else {
+            Log.write("No Bluecove Library detected - trying anyway...");
+        }
+    }
+
+    public static WiimoteWiigee getInstance() {
+        if (instance == null) {
+            instance = new WiimoteWiigee();
+            return instance;
+        } else {
+            return instance;
+        }
+    }
+
+    /**
+     * Returns an array of discovered wiimotes.
+     *
+     * @return Array of discovered wiimotes or null if
+     * none discoverd.
+     */
+    public Wiimote[] getDevices() throws IOException {
+        this.devices = this.discoverWiimotes();
+        for (int i = 0; i < this.devices.size(); i++) {
+            this.devices.elementAt(i).setLED(i + 1);
+        }
+        Wiimote[] out = new Wiimote[this.devices.size()];
+        for (int i = 0; i < this.devices.size(); i++) {
+            out[i] = this.devices.elementAt(i);
+        }
+        return out;
+    }
+
+    /**
+     * Discover the wiimotes around the bluetooth host and
+     * make them available public via getWiimotes method.
+     *
+     * @return Array of discovered wiimotes.
+     */
+    private Vector<Wiimote> discoverWiimotes() throws IOException {
+        WiimoteDeviceDiscovery deviceDiscovery = new WiimoteDeviceDiscovery(lock);
+        LocalDevice localDevice = LocalDevice.getLocalDevice();
+        Log.write("Your Computers Bluetooth MAC: " + localDevice.getBluetoothAddress());
+
+        Log.write("Starting device inquiry...");
+        DiscoveryAgent discoveryAgent = localDevice.getDiscoveryAgent();
+        discoveryAgent.startInquiry(DiscoveryAgent.GIAC, deviceDiscovery);
+
+
+        try {
+            synchronized (lock) {
+                lock.wait();
+            }
+        } catch (InterruptedException e) {
+            Log.write("Problems during device discovery.");
+            e.printStackTrace();
+        }
+
+        Log.write("Device discovery completed!");
+        return deviceDiscovery.getDiscoveredWiimotes();
+    }
+
+    /**
+     * Returns the number of wiimotes discovered.
+     *
+     * @return Number of wiimotes discovered.
+     */
+    public int getNumberOfDevices() {
+        return this.devices.size();
+    }
+
+    /**
+     * Sets the Trainbutton for all wiimotes;
+     *
+     * @param b Button encoding, see static Wiimote values
+     */
+    public void setTrainButton(int b) {
+        for (int i = 0; i < this.devices.size(); i++) {
+            this.devices.elementAt(i).setTrainButton(b);
+        }
+    }
+
+    /**
+     * Sets the Recognitionbutton for all wiimotes;
+     *
+     * @param b Button encoding, see static Wiimote values
+     */
+    public void setRecognitionButton(int b) {
+        for (int i = 0; i < this.devices.size(); i++) {
+            this.devices.elementAt(i).setRecognitionButton(b);
+        }
+    }
+
+    /**
+     * Sets the CloseGesturebutton for all wiimotes;
+     *
+     * @param b Button encoding, see static Wiimote values
+     */
+    public void setCloseGestureButton(int b) {
+        for (int i = 0; i < this.devices.size(); i++) {
+            this.devices.elementAt(i).setCloseGestureButton(b);
+        }
+    }
+
+    public void addDeviceListener(DeviceListener listener) {
+        for (int i = 0; i < this.devices.size(); i++) {
+            this.devices.elementAt(i).addDeviceListener(listener);
+        }
+    }
+
+    public void addGestureListener(GestureListener listener) {
+        for (int i = 0; i < this.devices.size(); i++) {
+            this.devices.elementAt(i).addGestureListener(listener);
+        }
+    }
+
+    public void addFilter(Filter filter) {
+        for (int i = 0; i < this.devices.size(); i++) {
+            this.devices.elementAt(i).addFilter(filter);
+        }
+    }
 }
