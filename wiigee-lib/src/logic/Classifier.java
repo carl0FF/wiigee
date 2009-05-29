@@ -44,7 +44,7 @@ public class Classifier {
 	 * @param g	gesture to classify
 	 */
 	public int classifyGesture(Gesture g) {
-		//System.out.println("Recognizing gesture...");
+		//Log.write("Recognizing gesture...");
 		
 		// Wert im Nenner berechnen, nach Bayes
 		double sum = 0;

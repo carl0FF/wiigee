@@ -23,8 +23,9 @@
  */
 
 package logic;
-import java.text.*;
+import java.text.DecimalFormat;
 import java.util.Vector;
+import util.Log;
 
 /**
  * This is a Hidden Markov Model implementation which internally provides
@@ -272,20 +273,20 @@ public class HMM {
 		fmt.setMinimumFractionDigits(5);
 		fmt.setMaximumFractionDigits(5);
 		for (int i = 0; i < numStates; i++)
-			System.out.println("pi(" + i + ") = " + fmt.format(pi[i]));
-		System.out.println();
+			Log.write("pi(" + i + ") = " + fmt.format(pi[i]));
+		Log.write("");
 		for (int i = 0; i < numStates; i++) {
 			for (int j = 0; j < numStates; j++)
-				System.out.print("a(" + i + "," + j + ") = "
+				Log.write("a(" + i + "," + j + ") = "
 						+ fmt.format(a[i][j]) + " ");
-			System.out.println();
+			Log.write("");
 		}
-		System.out.println();
+		Log.write("");
 		for (int i = 0; i < numStates; i++) {
 			for (int k = 0; k < numObservations; k++)
-				System.out.print("b(" + i + "," + k + ") = "
+				Log.write("b(" + i + "," + k + ") = "
 						+ fmt.format(b[i][k]) + " ");
-			System.out.println();
+			Log.write("");
 		}
 	}
 	

@@ -31,6 +31,7 @@ import javax.bluetooth.L2CAPConnection;
 
 import event.ButtonPressedEvent;
 import event.ButtonReleasedEvent;
+import util.Log;
 
 /**
  * This class listens to data sended by the wiimote and generates specific
@@ -86,7 +87,7 @@ public class WiimoteStreamer extends Thread {
 					this.x1 = b[11] & 0xFF;
 					this.y1 = b[12] & 0xFF;
 					this.z1 = b[13] & 0xFF;
-					System.out.println("Autocalibration successful!");
+					Log.write("Autocalibration successful!");
 					continue;
 				}
 
@@ -258,7 +259,7 @@ public class WiimoteStreamer extends Thread {
 			} // while(running)
 
 		} catch (IOException e) {
-			System.out.println("Streamer: Connection to Wiimote lost.");
+			Log.write("Streamer: Connection to Wiimote lost.");
 			this.running = false;
 		}
 	}

@@ -26,6 +26,7 @@ package logic;
 
 import java.util.Vector;
 import event.AccelerationEvent;
+import util.Log;
 
 /** 
  * This Class units a Quantizer-Component and an Model-Component.
@@ -129,7 +130,7 @@ public class GestureModel {
 	 * For debug purposes or very technical interested people. :)
 	 */
 	public void printMap() {
-		System.out.println("Gesture Quantizer-Map:");
+		Log.write("Gesture Quantizer-Map:");
 		this.quantizer.printMap();
 	}
 	
@@ -138,9 +139,9 @@ public class GestureModel {
 	 * @return
 	 */
 	public void print() {
-		System.out.println("HMM-Print:");
+		Log.write("HMM-Print:");
 		this.markovmodell.print();
-		System.out.println("Quanzizer-Print:");
+		Log.write("Quanzizer-Print:");
 		this.quantizer.printMap();
 	}
 	
@@ -182,7 +183,7 @@ public class GestureModel {
 	
 	public void setDefaultProbability(double prob) {
 		this.defaultprobability = prob;
-		System.out.println("def-prob. set to = "+this.defaultprobability);
+		Log.write("def-prob. set to = "+this.defaultprobability);
 	}
 
 	public Quantizer getQuantizer() {

@@ -29,6 +29,7 @@ import java.util.Random;
 import javax.bluetooth.L2CAPConnection;
 import javax.microedition.io.Connector;
 import event.*;
+import util.Log;
 
 /**
  * @author Benjamin 'BePo' Poppinga
@@ -70,7 +71,7 @@ public class Wiimote extends Device {
 	
 	// LED encoded as byte
 	byte ledencoding;
-	
+    
 	
 	// control connection, send commands to wiimote
 	private L2CAPConnection controlCon;
@@ -125,9 +126,9 @@ public class Wiimote extends Device {
 		try {
 			this.controlCon.close();
 			this.receiveCon.close();
-			System.out.println("Disconnected wiimote.");
+			Log.write("Disconnected wiimote.");
 		} catch(Exception e) {
-			System.out.println("Failure during disconnect of wiimote.");
+			Log.write("Failure during disconnect of wiimote.");
 		}
 	}
 	

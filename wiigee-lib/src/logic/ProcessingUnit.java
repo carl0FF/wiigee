@@ -12,6 +12,7 @@ import event.InfraredEvent;
 import event.MotionStartEvent;
 import event.MotionStopEvent;
 import event.StateEvent;
+import util.Log;
 
 public abstract class ProcessingUnit implements DeviceListener {
 
@@ -69,9 +70,9 @@ public abstract class ProcessingUnit implements DeviceListener {
 	public void reset() {
 		if(this.classifier.getCountOfGestures()>0) {
 			this.classifier.clear();
-			System.out.println("### Model reset ###");
+			Log.write("### Model reset ###");
 		} else {
-			System.out.println("There doesn't exist any data to reset.");
+			Log.write("There doesn't exist any data to reset.");
 		}
 	}
 	

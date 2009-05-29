@@ -33,6 +33,7 @@ import filter.DirectionalEquivalenceFilter;
 import filter.Filter;
 import filter.IdleStateFilter;
 import filter.MotionDetectFilter;
+import util.Log;
 
 public class Device {
 	
@@ -52,7 +53,7 @@ public class Device {
 	
 	// Listeners, receive generated events
 	protected Vector<DeviceListener> devicelistener = new Vector<DeviceListener>();
-	protected ProcessingUnit processingunit = new TriggeredProcessingUnit();
+	protected ProcessingUnit processingunit = new ContinuousProcessingUnit();//new TriggeredProcessingUnit();
 	
 	public Device() {
 		this.addFilter(new IdleStateFilter());
@@ -67,7 +68,7 @@ public class Device {
 	 */
 	public void addFilter(Filter filter) {
 		this.filters.add(filter);
-		System.out.println("Filter added...");
+		Log.write("Filter added...");
 	}
 	
 	/**
@@ -88,7 +89,7 @@ public class Device {
 	 */
 	public void addDeviceListener(DeviceListener listener) {
 		this.devicelistener.add(listener);
-		System.out.println("WiimoteListener added...");
+		Log.write("WiimoteListener added...");
 	}
 	
 	/**
@@ -98,7 +99,7 @@ public class Device {
 	 */
 	public void addGestureListener(GestureListener listener) {
 		this.processingunit.addGestureListener(listener);
-		System.out.println("GestureListener added...");
+		Log.write("GestureListener added...");
 	}
 	
 	public int getRecognitionButton() {
