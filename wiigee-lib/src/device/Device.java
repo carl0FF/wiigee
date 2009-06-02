@@ -53,7 +53,7 @@ public class Device {
 	
 	// Listeners, receive generated events
 	protected Vector<DeviceListener> devicelistener = new Vector<DeviceListener>();
-	protected ProcessingUnit processingunit = new ContinuousProcessingUnit();//new TriggeredProcessingUnit();
+	protected ProcessingUnit processingunit = new TriggeredProcessingUnit();//new TriggeredProcessingUnit();
 	
 	public Device() {
 		this.addFilter(new IdleStateFilter());
