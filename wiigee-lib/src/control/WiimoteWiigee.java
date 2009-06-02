@@ -26,9 +26,6 @@ package control;
 import java.io.IOException;
 import java.util.Vector;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.bluetooth.BluetoothStateException;
 import javax.bluetooth.DiscoveryAgent;
 import javax.bluetooth.LocalDevice;
 
