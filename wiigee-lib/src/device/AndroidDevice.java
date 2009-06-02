@@ -48,7 +48,6 @@ public class AndroidDevice extends Device implements SensorListener {
 
     }
 
-    @Override
     public void onSensorChanged(int sensor, float[] values) {
         if (this.accelerationEnabled() && sensor == SensorManager.SENSOR_ACCELEROMETER) {
 
@@ -72,7 +71,6 @@ public class AndroidDevice extends Device implements SensorListener {
         }
     }
 
-    @Override
     public void onAccuracyChanged(int arg0, int arg1) {
         // TODO
     }
