@@ -53,12 +53,12 @@ public class Device {
 	
 	// Listeners, receive generated events
 	protected Vector<DeviceListener> devicelistener = new Vector<DeviceListener>();
-	protected ProcessingUnit processingunit = new TriggeredProcessingUnit();//new TriggeredProcessingUnit();
+	protected ProcessingUnit processingunit = new TriggeredProcessingUnit();
 	
 	public Device() {
-		//this.addFilter(new IdleStateFilter());
-		//this.addFilter(new MotionDetectFilter(this));
-		//this.addFilter(new DirectionalEquivalenceFilter());
+		this.addFilter(new IdleStateFilter());
+		this.addFilter(new MotionDetectFilter(this));
+		this.addFilter(new DirectionalEquivalenceFilter());
 		this.addDeviceListener(this.processingunit);
 	}
 	
