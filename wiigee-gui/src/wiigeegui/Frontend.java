@@ -22,6 +22,9 @@ import event.InfraredEvent;
 import event.MotionStartEvent;
 import event.MotionStopEvent;
 import event.StateEvent;
+import filter.HighPassFilter;
+import filter.LowPassFilter;
+import filter.VelocityFilter;
 import java.awt.Color;
 import java.awt.Component;
 import java.io.BufferedReader;
@@ -36,6 +39,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
 import javax.swing.filechooser.FileFilter;
+import util.Log;
 
 
 /**
@@ -79,6 +83,11 @@ public class Frontend extends javax.swing.JFrame implements GestureListener, Dev
         } else if (event.isCloseGestureInitEvent()) {
             // show a dialog to enter gesture meaning
             this.getGestureMeaningDialog.setVisible(true);
+        }
+
+        if(event.getButton()==Wiimote.BUTTON_MINUS) {
+            Log.write("FILTER RESET!");
+            this.wiimote.resetFilters();
         }
     }
 
@@ -166,7 +175,7 @@ public class Frontend extends javax.swing.JFrame implements GestureListener, Dev
             }
         });
 
-        wiimotesMacTextField.setText("00:00:00:00:00");
+        wiimotesMacTextField.setText("00:1E:35:0F:40:BA");
 
         org.jdesktop.layout.GroupLayout selectWiimoteDialogLayout = new org.jdesktop.layout.GroupLayout(selectWiimoteDialog.getContentPane());
         selectWiimoteDialog.getContentPane().setLayout(selectWiimoteDialogLayout);
@@ -470,12 +479,7 @@ public class Frontend extends javax.swing.JFrame implements GestureListener, Dev
                 this.scanWiimoteStatusLabel.setText("Found a Wiimote!");
                 this.scanWiimoteApproveButton.setEnabled(true);
                 this.wiimote = wiimotes[0];
-                this.wiimote.setCloseGestureButton(Wiimote.BUTTON_HOME);
-                this.wiimote.setRecognitionButton(Wiimote.BUTTON_B);
-                this.wiimote.setTrainButton(Wiimote.BUTTON_A);
-                this.wiimote.setLED(1);
-                this.wiimote.addDeviceListener(this);
-                this.wiimote.addGestureListener(this);
+                this.setupWiimote();
             }
         } catch (IOException ex) {
             this.scanWiimoteStatusLabel.setText("No Wiimote found!");
@@ -502,12 +506,7 @@ public class Frontend extends javax.swing.JFrame implements GestureListener, Dev
         try { // manual connect: 001E350F40BA
             this.selectWiimoteDialog.setVisible(false);
             this.wiimote = new Wiimote(this.wiimotesMacTextField.getText());
-            this.wiimote.setCloseGestureButton(Wiimote.BUTTON_HOME);
-            this.wiimote.setRecognitionButton(Wiimote.BUTTON_B);
-            this.wiimote.setTrainButton(Wiimote.BUTTON_A);
-            this.wiimote.setLED(1);
-            this.wiimote.addDeviceListener(this);
-            this.wiimote.addGestureListener(this);
+            this.setupWiimote();
         } catch (IOException ex) {
             Logger.getLogger(Frontend.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -546,6 +545,22 @@ public class Frontend extends javax.swing.JFrame implements GestureListener, Dev
             }
         }
     }//GEN-LAST:event_loadGesturesItemActionPerformed
+
+    private void setupWiimote() {
+        try {
+            this.wiimote.setCloseGestureButton(Wiimote.BUTTON_HOME);
+            this.wiimote.setRecognitionButton(Wiimote.BUTTON_B);
+            this.wiimote.setTrainButton(Wiimote.BUTTON_A);
+            this.wiimote.setLED(1);
+            this.wiimote.addFilter(new HighPassFilter(0.1));
+            this.wiimote.addFilter(new VelocityFilter());
+            this.wiimote.addDeviceListener(this);
+            this.wiimote.addGestureListener(this);
+        } catch (IOException ex) {
+            Log.write("Grosser Mist:");
+            ex.printStackTrace();
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem autoconnectWiimoteItem;
