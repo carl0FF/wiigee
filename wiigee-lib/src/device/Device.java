@@ -56,9 +56,9 @@ public class Device {
 	protected ProcessingUnit processingunit = new TriggeredProcessingUnit();//new TriggeredProcessingUnit();
 	
 	public Device() {
-		this.addFilter(new IdleStateFilter());
-		this.addFilter(new MotionDetectFilter(this));
-		this.addFilter(new DirectionalEquivalenceFilter());
+		//this.addFilter(new IdleStateFilter());
+		//this.addFilter(new MotionDetectFilter(this));
+		//this.addFilter(new DirectionalEquivalenceFilter());
 		this.addDeviceListener(this.processingunit);
 	}
 	
