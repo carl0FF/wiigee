@@ -94,7 +94,7 @@ public class Wiimote extends Device {
 	 * 			String representation of the mac-adress e.g. 00191D68B57C
 	 */
 	public Wiimote(String btaddress) throws IOException {
-		btaddress = this.removeChar(btaddress, ':');
+        btaddress = this.removeChar(btaddress, ':');
 		this.btaddress=btaddress;
 		this.vibrating=false;
 		this.connect();
@@ -287,6 +287,7 @@ public class Wiimote extends Device {
 	 * nothing else would happen.
 	 * 
 	 */
+    @Override
 	public void enableAccelerationSensors() throws IOException {
 		super.enableAccelerationSensors();
 		if(!this.calibrated) {
@@ -301,6 +302,7 @@ public class Wiimote extends Device {
 	 * Deactivates the acceleration sensors.
 	 * 
 	 */
+    @Override
 	public void disableAccelerationSensors() throws IOException {
 		super.disableAccelerationSensors();
 		this.sendRaw(new byte[] {CMD_SET_REPORT, 0x12, 0x00, 0x30});

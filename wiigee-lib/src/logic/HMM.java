@@ -135,7 +135,6 @@ public class HMM {
 				double nenner=0;
 			
 				for(int k=0; k<trainsequence.size(); k++) {
-					//this.reset();
 					int[] sequence = trainsequence.elementAt(k);
 					
 					double[][] fwd = this.forwardProc(sequence);
@@ -165,7 +164,6 @@ public class HMM {
 				double nenner=0;
 			
 				for(int k=0; k<trainsequence.size(); k++) {
-					//this.reset();
 					int[] sequence = trainsequence.elementAt(k);
 					
 					double[][] fwd = this.forwardProc(sequence);

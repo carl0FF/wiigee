@@ -56,6 +56,7 @@ public class WiimoteStreamer extends Thread {
 		this.receiveCon = wiimote.getReceiveConnection();
 	}
 
+    @Override
 	public void run() {
 		this.running = true;
 		int xraw, yraw, zraw;

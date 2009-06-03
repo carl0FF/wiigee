@@ -29,11 +29,7 @@ import java.util.Vector;
 
 import logic.*;
 import event.*;
-import filter.DirectionalEquivalenceFilter;
-import filter.Filter;
-import filter.IdleStateFilter;
-import filter.MotionDetectFilter;
-import util.Log;
+import filter.*;
 
 public class Device {
 	
@@ -68,7 +64,6 @@ public class Device {
 	 */
 	public void addFilter(Filter filter) {
 		this.filters.add(filter);
-		Log.write("Filter added...");
 	}
 	
 	/**
@@ -89,7 +84,6 @@ public class Device {
 	 */
 	public void addDeviceListener(DeviceListener listener) {
 		this.devicelistener.add(listener);
-		Log.write("WiimoteListener added...");
 	}
 	
 	/**
@@ -99,7 +93,6 @@ public class Device {
 	 */
 	public void addGestureListener(GestureListener listener) {
 		this.processingunit.addGestureListener(listener);
-		Log.write("GestureListener added...");
 	}
 	
 	public int getRecognitionButton() {
