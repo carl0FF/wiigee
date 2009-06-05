@@ -24,8 +24,6 @@
 
 package org.wiigee.device;
 
-import org.wiigee.logic.ProcessingUnit;
-import org.wiigee.logic.TriggeredProcessingUnit;
 import java.io.IOException;
 import java.util.Vector;
 

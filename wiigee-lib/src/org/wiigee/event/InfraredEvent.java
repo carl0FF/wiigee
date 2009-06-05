@@ -25,16 +25,16 @@
 package org.wiigee.event;
 
 import java.util.EventObject;
-import org.wiigee.device.Wiimote;
+import org.wiigee.device.Device;
 
 public class InfraredEvent extends EventObject {
 
-	protected Wiimote wiimote;
+	protected Device wiimote;
 	protected int[][] coordinates;
 	protected int[] size;
 	protected boolean[] valid;
 	
-	public InfraredEvent(Wiimote source, int[][] coordinates, int[] size) {
+	public InfraredEvent(Device source, int[][] coordinates, int[] size) {
 		super(source);
 		this.coordinates=coordinates;
 		this.size=size;
@@ -44,7 +44,7 @@ public class InfraredEvent extends EventObject {
 		}
 	}
 	
-	public Wiimote getSource() {
+	public Device getSource() {
 		return this.wiimote;
 	}
 	
