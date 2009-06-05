@@ -1,6 +1,6 @@
 package wiigeegui;
 
-import event.AccelerationEvent;
+import org.wiigee.event.AccelerationEvent;
 import java.awt.Color;
 import java.awt.Graphics;
 import javax.swing.JPanel;

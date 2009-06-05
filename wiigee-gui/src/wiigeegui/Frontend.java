@@ -10,21 +10,21 @@
  */
 package wiigeegui;
 
-import control.WiimoteWiigee;
-import device.Wiimote;
-import event.AccelerationEvent;
-import event.ButtonPressedEvent;
-import event.ButtonReleasedEvent;
-import event.DeviceListener;
-import event.GestureEvent;
-import event.GestureListener;
-import event.InfraredEvent;
-import event.MotionStartEvent;
-import event.MotionStopEvent;
-import event.StateEvent;
-import filter.HighPassFilter;
-import filter.LowPassFilter;
-import filter.VelocityFilter;
+import org.wiigee.control.WiimoteWiigee;
+import org.wiigee.device.Wiimote;
+import org.wiigee.event.AccelerationEvent;
+import org.wiigee.event.ButtonPressedEvent;
+import org.wiigee.event.ButtonReleasedEvent;
+import org.wiigee.event.DeviceListener;
+import org.wiigee.event.GestureEvent;
+import org.wiigee.event.GestureListener;
+import org.wiigee.event.InfraredEvent;
+import org.wiigee.event.MotionStartEvent;
+import org.wiigee.event.MotionStopEvent;
+import org.wiigee.event.StateEvent;
+import org.wiigee.filter.HighPassFilter;
+import org.wiigee.filter.LowPassFilter;
+import org.wiigee.filter.VelocityFilter;
 import java.awt.Color;
 import java.awt.Component;
 import java.io.BufferedReader;
@@ -39,7 +39,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
 import javax.swing.filechooser.FileFilter;
-import util.Log;
+import org.wiigee.util.Log;
 
 
 /**

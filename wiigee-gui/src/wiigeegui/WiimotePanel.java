@@ -1,8 +1,8 @@
 package wiigeegui;
 
-import device.Wiimote;
-import event.ButtonPressedEvent;
-import event.ButtonReleasedEvent;
+import org.wiigee.device.Wiimote;
+import org.wiigee.event.ButtonPressedEvent;
+import org.wiigee.event.ButtonReleasedEvent;
 import java.awt.Graphics;
 import java.util.EventObject;
 import javax.swing.ImageIcon;
