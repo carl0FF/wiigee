@@ -40,20 +40,20 @@ import org.wiigee.util.Log;
 
 public class HMM {
 	/** The number of states */
-	private int numStates;
+	protected int numStates;
 
 	/** The number of observations */
-	private int numObservations;
+	protected int numObservations;
 
 	/** The initial probabilities for each state: p[state] */
-	private double pi[];
+	protected double pi[];
 
 	/** The state change probability to switch from state A to
 	 * state B: a[stateA][stateB] */
-	private double a[][];
+	protected double a[][];
 
 	/** The probability to emit symbol S in state A: b[stateA][symbolS] */
-	private double b[][];
+	protected double b[][];
 
 	/**
 	 * Initialize the Hidden Markov Model in a left-to-right version.
@@ -199,7 +199,7 @@ public class HMM {
 	 * @return Array[State][Time] 
 	 * 
 	 */
-	private double[][] forwardProc(int[] o) {
+	protected double[][] forwardProc(int[] o) {
 		double[][] f = new double[numStates][o.length];
 		for (int l = 0; l < f.length; l++) {
 			f[l][0] = pi[l] * b[l][o[0]];
@@ -241,7 +241,7 @@ public class HMM {
 	 * @param o observation sequence o
 	 * @return Array[State][Time]
 	 */
-	public double[][] backwardProc(int[] o) {
+	protected double[][] backwardProc(int[] o) {
 		int T = o.length;
 		double[][] bwd = new double[numStates][T];
 		/* Basisfall */

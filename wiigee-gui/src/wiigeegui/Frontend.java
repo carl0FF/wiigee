@@ -54,7 +54,7 @@ public class Frontend extends javax.swing.JFrame implements GestureListener, Dev
 
     /** Creates new form Frontend */
     public Frontend() {
-        this.wiigee = WiimoteWiigee.getInstance();
+        this.wiigee = new WiimoteWiigee();
         this.gestureMeanings = new Vector<String>();
         initComponents();
     }
@@ -474,11 +474,11 @@ public class Frontend extends javax.swing.JFrame implements GestureListener, Dev
     private void autoconnectWiimoteItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoconnectWiimoteItemActionPerformed
         //this.scanWiimoteDialog.setVisible(true);
         try {
-            Wiimote[] wiimotes = this.wiigee.getDevices();
-            if (wiimotes.length > 0) {
+            Wiimote wm = this.wiigee.getDevice();
+            if (wm != null) {
                 this.scanWiimoteStatusLabel.setText("Found a Wiimote!");
                 this.scanWiimoteApproveButton.setEnabled(true);
-                this.wiimote = wiimotes[0];
+                this.wiimote = wm;
                 this.setupWiimote();
             }
         } catch (IOException ex) {
@@ -505,7 +505,7 @@ public class Frontend extends javax.swing.JFrame implements GestureListener, Dev
     private void connectWiimoteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectWiimoteButtonActionPerformed
         try { // manual connect: 001E350F40BA
             this.selectWiimoteDialog.setVisible(false);
-            this.wiimote = new Wiimote(this.wiimotesMacTextField.getText());
+            this.wiimote = new Wiimote(this.wiimotesMacTextField.getText(), true, true);
             this.setupWiimote();
         } catch (IOException ex) {
             Logger.getLogger(Frontend.class.getName()).log(Level.SEVERE, null, ex);
@@ -547,19 +547,8 @@ public class Frontend extends javax.swing.JFrame implements GestureListener, Dev
     }//GEN-LAST:event_loadGesturesItemActionPerformed
 
     private void setupWiimote() {
-        try {
-            this.wiimote.setCloseGestureButton(Wiimote.BUTTON_HOME);
-            this.wiimote.setRecognitionButton(Wiimote.BUTTON_B);
-            this.wiimote.setTrainButton(Wiimote.BUTTON_A);
-            this.wiimote.setLED(1);
-            this.wiimote.addFilter(new HighPassFilter(0.1));
-            this.wiimote.addFilter(new VelocityFilter());
-            this.wiimote.addDeviceListener(this);
-            this.wiimote.addGestureListener(this);
-        } catch (IOException ex) {
-            Log.write("Grosser Mist:");
-            ex.printStackTrace();
-        }
+        this.wiimote.addDeviceListener(this);
+        this.wiimote.addGestureListener(this);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

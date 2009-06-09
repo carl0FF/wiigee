@@ -39,29 +39,20 @@ import org.wiigee.util.Log;
  * @author zl25drexel
  * @author Benjamin 'BePo' Poppinga
  */
-public class AndroidWiigee {
+public class AndroidWiigee extends Wiigee {
 
-    protected static String version = "1.0 alpha";
-    protected static String releasedate = "20090529";
-    protected static AndroidWiigee instance;
+    // Version information
+    protected static String pluginversion = "1.0 alpha";
+    protected static String pluginreleasedate = "20090529";
 
+    // Device
     private AndroidDevice device;
 
-    private AndroidWiigee() {
-            device = new AndroidDevice();
-    }
-
-    public static synchronized AndroidWiigee getInstance() {
-            Log.write("This is AndroidWiigee (Andgee) version "+version+" ("+releasedate+")");
-            Log.write("This is an Android adaptation of Wiigee (http://wiigee.sourceforge.net/)");
-            Log.write("So many thanks to the Wiigee team for their awsome recognition lib!");
-
-            if(instance == null) {
-                    instance = new AndroidWiigee();
-                    return instance;
-            } else {
-                    return instance;
-            }
+    
+    public AndroidWiigee() {
+        super();
+        Log.write("This is wiigee-plugin-android (Andgee) version "+pluginversion+" ("+pluginreleasedate+")");
+        device = new AndroidDevice();
     }
 
     public void addGestureListener(GestureListener listener) {

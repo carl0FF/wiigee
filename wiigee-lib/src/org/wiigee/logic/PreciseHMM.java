@@ -249,52 +249,6 @@ public class PreciseHMM {
 		return sf;
 	}  // calculateScalingFactor
 
-
-    // NEW
-    // returns s(t).
-    private double[] getScalingFactors(int[] sequence) {
-        double[][] fwd = this.forwardProc(sequence); // i t
-        double[] retVal = new double[fwd[0].length];
-
-        // init
-        // fixed t = 0 time
-        for(int i=0; i<fwd.length; i++) {
-            retVal[0] += fwd[i][0];
-        }
-        
-        // iterate
-        for(int t=1; t<fwd[0].length; t++) {
-            for(int i=0; i<fwd.length; i++) {
-                retVal[t] += fwd[i][t];
-            }
-        }
-
-        return retVal;
-    }
-	
-    // NEW b = state/symbol
-    private double[][] getScaledForwardProc(int[] sequence) {
-        double[][] fwd = this.forwardProc(sequence);
-        double[] s = this.getScalingFactors(sequence);
-        double[][] retVal = new double[fwd.length][fwd[0].length];
-
-        // init
-        // fixed t = 0 time
-        retVal[0][0] = this.b[0][0];
-        for(int i=0; i<retVal[0].length; i++) {
-            retVal[0][i] = 0.0;
-        }
-
-        // iterate
-        // t > 0 time
-        for(int t=1; t<retVal[0].length; t++) {
-
-        }
-
-
-        return null;
-    }
-
 	/***
 	 * Returns the scaled Forward variable.
 	 * TODO: Maybe try out if the other precalculated method is faster.

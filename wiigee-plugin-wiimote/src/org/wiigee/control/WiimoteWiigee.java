@@ -36,21 +36,21 @@ import org.wiigee.event.GestureListener;
 import org.wiigee.filter.Filter;
 
 // Singleton
-public class WiimoteWiigee {
+public class WiimoteWiigee extends Wiigee {
 
-    protected static String version = "1.5 alpha";
-    protected static String releasedate = "20090524";
-    protected static WiimoteWiigee instance;
-    private static Object lock = new Object();
+    protected static String pluginversion = "1.5 alpha";
+    protected static String pluginreleasedate = "20090524";
+    private static final Object lock = new Object();
     private Vector<Wiimote> devices;
 
-    private WiimoteWiigee() {
+    public WiimoteWiigee() {
+        super();
         String stack;
         String stackVersion;
         String l2capFeature;
         String bluecoveVersion;
 
-        Log.write("This is wiigee version " + version + " (" + releasedate + ")");
+        Log.write("This is wiigee-plugin-wiimote version " + pluginversion + " (" + pluginreleasedate + ")");
 
         // Bluecove
         bluecoveVersion = LocalDevice.getProperty("bluecove");
@@ -75,13 +75,9 @@ public class WiimoteWiigee {
         }
     }
 
-    public static WiimoteWiigee getInstance() {
-        if (instance == null) {
-            instance = new WiimoteWiigee();
-            return instance;
-        } else {
-            return instance;
-        }
+    public Wiimote getDevice() throws IOException {
+        this.devices = this.discoverWiimotes();
+        return devices.elementAt(0);
     }
 
     /**

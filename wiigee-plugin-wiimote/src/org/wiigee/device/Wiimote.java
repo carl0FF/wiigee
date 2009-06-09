@@ -31,6 +31,9 @@ import java.util.Random;
 import javax.bluetooth.L2CAPConnection;
 import javax.microedition.io.Connector;
 import org.wiigee.event.*;
+import org.wiigee.filter.DirectionalEquivalenceFilter;
+import org.wiigee.filter.HighPassFilter;
+import org.wiigee.filter.IdleStateFilter;
 import org.wiigee.util.Log;
 
 /**
@@ -87,24 +90,39 @@ public class Wiimote extends Device {
 	private boolean calibrated;
 	private boolean infraredenabled;
 	private WiimoteStreamer wms;
-	
-	
+    
 	/**
 	 * Creates a new wiimote-device with a specific bluetooth mac-adress.
-	 * 
+	 *
 	 * @param btaddress
-	 * 			String representation of the mac-adress e.g. 00191D68B57C
+	 * 			String representation of the mac-adress e.g. 00191D68B57C.
+     * @param autofiltering
+     *          If set the wiimote would automatically add the IdleStateFilter.
+     * @param autoconnect
+     *          If set the wiimote would automatically be connected.
 	 */
-	public Wiimote(String btaddress) throws IOException {
-        btaddress = this.removeChar(btaddress, ':');
-		this.btaddress=btaddress;
-		this.vibrating=false;
-		this.connect();
-		this.calibrateAccelerometer();
-		this.streamData(true);
-		this.enableAccelerationSensors();
-		//this.enableInfraredCamera();
-	}
+    public Wiimote(String btaddress, boolean autofiltering, boolean autoconnect) throws IOException {
+        this.btaddress = this.removeChar(btaddress, ':');
+        this.vibrating = false;
+        this.setCloseGestureButton(Wiimote.BUTTON_HOME);
+        this.setRecognitionButton(Wiimote.BUTTON_B);
+        this.setTrainButton(Wiimote.BUTTON_A);
+
+        // automatic filtering enabled
+        if(autofiltering) {
+            this.addFilter(new IdleStateFilter());
+            this.addFilter(new DirectionalEquivalenceFilter());
+        }
+
+        // automatic connect enabled
+        if(autoconnect) {
+            this.connect();
+            this.calibrateAccelerometer();
+            this.streamData(true);
+            this.enableAccelerationSensors();
+            this.setLED(1);
+        }
+    }
 	
 	/** 
 	 * Creates the two needed connections to send and receive commands
