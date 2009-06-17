@@ -48,12 +48,12 @@ public class MotionDetectFilter extends Filter {
 	}
 	
 	public void reset() {
-		super.reset();
 		this.motionstartstamp=System.currentTimeMillis();
 		this.nowinmotion=false;
 		this.motionchangetime=190;
 	}
 	
+    @Override
 	public double[] filter(double[] vector) {
 		
 		if(this.nowinmotion &&

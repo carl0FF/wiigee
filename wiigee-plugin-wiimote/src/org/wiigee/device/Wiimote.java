@@ -1,6 +1,6 @@
 /*
  * wiigee - accelerometerbased gesture recognition
- * Copyright (C) 2007, 2008 Benjamin Poppinga
+ * Copyright (C) 2007, 2008, 2009 Benjamin Poppinga
  * 
  * Developed at University of Oldenburg
  * Contact: benjamin.poppinga@informatik.uni-oldenburg.de
@@ -28,10 +28,12 @@ import org.wiigee.event.InfraredEvent;
 import org.wiigee.device.*;
 import java.io.IOException;
 import java.util.Random;
+import java.util.Vector;
 import javax.bluetooth.L2CAPConnection;
 import javax.microedition.io.Connector;
 import org.wiigee.event.*;
 import org.wiigee.filter.DirectionalEquivalenceFilter;
+import org.wiigee.filter.Filter;
 import org.wiigee.filter.HighPassFilter;
 import org.wiigee.filter.IdleStateFilter;
 import org.wiigee.util.Log;
@@ -76,14 +78,19 @@ public class Wiimote extends Device {
 	
 	// LED encoded as byte
 	byte ledencoding;
-    
+
+    // Filters, can filter the data stream
+	protected Vector<Filter> rotfilters = new Vector<Filter>();
 	
 	// control connection, send commands to wiimote
 	private L2CAPConnection controlCon;
 	
 	// receive connection, receive answers from wiimote
 	private L2CAPConnection receiveCon;
-	
+
+    // Listeners, receive generated events
+	protected Vector<InfraredListener> infraredlistener = new Vector<InfraredListener>();
+    protected Vector<RotationListener> rotationListener = new Vector<RotationListener>();
 	
 	// Functional
 	private boolean vibrating;
@@ -180,7 +187,16 @@ public class Wiimote extends Device {
 				wms.stopThread();
 		}
 	}
-	
+
+
+	public void addInfraredListener(InfraredListener listener) {
+		this.infraredlistener.add(listener);
+	}
+
+    public void addRotationListener(RotationListener listener) {
+        this.rotationListener.add(listener);
+    }
+
 	/**
 	 * Write data to a register inside of the wiimote.
 	 * 
@@ -362,8 +378,32 @@ public class Wiimote extends Device {
 		
 		// enable continuous acceleration and IR cam on channel 33
 		this.sendRaw(new byte[] {CMD_SET_REPORT, 0x12, 0x00, 0x33});
-	
 	}
+    
+    /**
+     * To enable the Wii Motion Plus extension. The wiimote will further get
+     * every other information, like acceleration, infrared camera (loss of precision)
+     * and button presses.
+     *
+     * @throws java.io.IOException
+     */
+    public void enableWiiMotionPlus() throws IOException {
+
+        Log.write("Enabling WII MOTION PLUS..");
+
+        // write 0x55 to 0x04a600f0
+        this.writeRegister(new byte[] {(byte)0xa6, 0x00, (byte)0xf0}, new byte[] {0x55});
+        
+        // write 0x00 to 0x04a600fb
+        this.writeRegister(new byte[] {(byte)0xa6, 0x00, (byte)0xfb}, new byte[] {0x00});
+
+        // write 0x04 to 0x04a600fe to get wii m+ data within extension reports
+        this.writeRegister(new byte[] {(byte)0xa6, 0x00, (byte)0xfe}, new byte[] {0x04});
+
+        // enable extension byte containing channel 37
+        this.sendRaw(new byte[] {CMD_SET_REPORT, 0x12, 0x00, 0x37});
+    }
+
 	
 	
 	/**
@@ -392,6 +432,43 @@ public class Wiimote extends Device {
 	public boolean infraredEnabled() {
 		return this.infraredenabled;
 	}
+
+    /**
+	 * Fires a infrared event
+	 *
+	 * @param coordinates
+	 * @param size
+	 */
+	public void fireInfraredEvent(int[][] coordinates, int[] size) {
+		InfraredEvent w = new InfraredEvent(this, coordinates, size);
+		for(int i=0; i<this.infraredlistener.size(); i++) {
+			this.infraredlistener.get(i).infraredReceived(w);
+		}
+	}
+
+    /**
+     * If a Wii Motion Plus is attached and activated properly this
+     * event could be fired within every change of orientation of the
+     * device. The orientation is not used to do gesture recognition,
+     * yet.
+     *
+     * @param vector The rotational speed vector, containing:
+     *  phi - Rotational speed of x axis (pitch)
+     *  theta - Rotational speed of y axis (roll)
+     *  psi - Rotational speed of z axis (yaw)
+     */
+    public void fireRotationSpeedEvent(double[] vector) {
+		/*for(int i=0; i<this.accfilters.size(); i++) {
+			vector = this.accfilters.get(i).filter(vector);
+			// cannot return here if null, because of time-dependent accfilters
+		}*/
+
+        RotationSpeedEvent w = new RotationSpeedEvent(this, vector[0], vector[1], vector[2]);
+        for(int i=0; i<this.rotationListener.size(); i++) {
+            this.rotationListener.elementAt(i).rotationSpeedReceived(w);
+        }
+    }
+    
 	
 	// ###### Hilfsmethoden
 	// TODO	
@@ -402,20 +479,5 @@ public class Wiimote extends Device {
 	       }
 	    return r;
 	}
-	
-	/**
-	 * Fires a infrared event
-	 * 
-	 * @param coordinates
-	 * @param size
-	 */
-	public void fireInfraredEvent(int[][] coordinates, int[] size) {
-		InfraredEvent w = new InfraredEvent(this, coordinates, size);
-		for(int i=0; i<this.devicelistener.size(); i++) {
-			this.devicelistener.get(i).infraredReceived(w);
-		}
-	}
-
-
 	
 }

@@ -38,6 +38,12 @@ public class IdleStateFilter extends Filter {
 		this.sensivity = 0.1;
 	}
 
+    @Override
+    public void reset() {
+        // not needed
+    }
+
+    @Override
 	public double[] filterAlgorithm(double[] vector) {
 		// calculate values needed for filtering:
 		// absolute value

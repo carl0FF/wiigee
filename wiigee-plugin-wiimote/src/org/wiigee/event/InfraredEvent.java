@@ -1,7 +1,7 @@
 /*
  * wiigee - accelerometerbased gesture recognition
  * Copyright (C) 2007, 2008, 2009 Benjamin Poppinga
- *
+ * 
  * Developed at University of Oldenburg
  * Contact: benjamin.poppinga@informatik.uni-oldenburg.de
  *
@@ -16,27 +16,43 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package org.wiigee.control;
+package org.wiigee.event;
 
-import org.wiigee.util.Log;
+import java.util.EventObject;
+import org.wiigee.device.Device;
 
-/**
- *
- * @author bepo
- */
-public class Wiigee {
+public class InfraredEvent extends EventObject {
 
-    protected static String version = "1.5 alpha";
-    protected static String releasedate = "20090617";
+	protected int[][] coordinates;
+	protected int[] size;
+	protected boolean[] valid;
+	
+	public InfraredEvent(Device source, int[][] coordinates, int[] size) {
+		super(source);
+		this.coordinates=coordinates;
+		this.size=size;
+		this.valid = new boolean[4];
+		for(int i=0; i<this.coordinates.length; i++) {
+			this.valid[i] = (this.coordinates[i][0]<1023 && this.coordinates[i][1]<1023);
+		}
+	}
+	
+	public boolean isValid(int i) {
+		return this.valid[i];
+	}
+	
+	public int[][] getCoordinates() {
+		return this.coordinates;
+	}
+	
+	public int[] getSize() {
+		return this.size;
+	}
 
-    protected Wiigee() {
-        Log.write("This is wiigee version "+version+" ("+releasedate+")");
-    }
-    
 }

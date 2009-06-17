@@ -42,6 +42,22 @@ import org.wiigee.util.Log;
  */
 public class WiimoteStreamer extends Thread {
 
+    private int psimin = Integer.MAX_VALUE;
+    private int psimax = Integer.MIN_VALUE;
+    private int thetamin = Integer.MAX_VALUE;
+    private int thetamax = Integer.MIN_VALUE;
+    private int phimin = Integer.MAX_VALUE;
+    private int phimax = Integer.MIN_VALUE;
+
+    private int minx = Integer.MAX_VALUE;
+    private int maxx = Integer.MIN_VALUE;
+    private int miny = Integer.MAX_VALUE;
+    private int maxy = Integer.MIN_VALUE;
+    private int minz = Integer.MAX_VALUE;
+    private int maxz = Integer.MIN_VALUE;
+
+
+
 	boolean running;
 	double x0, x1, y0, y1, z0, z1;
 
@@ -68,45 +84,82 @@ public class WiimoteStreamer extends Thread {
 				
 				byte[] b = this.getRaw(); // blocks application
 
+                // Log.write("");
+
 				// debug output
 				/* for(int i=0; i<b.length; i++) {
 				 * System.out.print((int)b[i]&0xFF); if(i==input.length-1) {
 				 * System.out.println(""); } else { System.out.print(":"); } }
 				 */
-                
-
-				// wiimote wants to tell the calibration data
-				if ((b[1] & 0xFF) == 0x21) {
-                    this.handleCalibrationData(
-                            new byte[] {b[7], b[8], b[9], b[11], b[12], b[13]});
-                }
 
 
 				// infrared is enabled, so have a look at the last bytes
 				if (this.wiimote.infraredEnabled()
 						&& (b[1] & 0xFF) == 0x33) {
-                    this.handleInfraredDate(
+                    this.handleButtonData(b[2], b[3]);
+                    this.handleInfraredData(
                             new byte[] {b[7], b[8], b[9],
                                         b[10], b[11], b[12],
                                         b[13], b[14], b[15],
                                         b[16], b[17], b[18]});
+                    // Log.write("Button + Irda");
                 }
                 
                 
 				// if the wiimote is sending acceleration data...
-				if (this.wiimote.accelerationEnabled()
-                    && (    (((b[1] & 0xFF) & 0x31) == 0x31)
-                         || (((b[1] & 0xFF) & 0x33) == 0x33)
-                         || (((b[1] & 0xFF) & 0x35) == 0x35)
-                         || (((b[1] & 0xFF) & 0x37) == 0x37)
+                else if (this.wiimote.accelerationEnabled()
+                    && (    ((b[1] & 0xFF) == 0x31)
+                         || ((b[1] & 0xFF) == 0x33)
+                         || ((b[1] & 0xFF) == 0x35)
+                         || ((b[1] & 0xFF) == 0x37)
                        )
                    ) {
+                    this.handleButtonData(b[2], b[3]);
                     this.handleAccelerationData(new byte[] { b[4], b[5], b[6] });
+                    // Log.write("Button + Acc");
 				}
 
-                
-                // process buttons
-				this.handleButtonData(b[2], b[3]);
+                // if we are on channel 37.
+                else if ((b[1] & 0xFF) == 0x37) {
+                    this.handleButtonData(b[2], b[3]);
+                    this.handleAccelerationData(new byte[] { b[4], b[5], b[6] });
+                    this.handleWiiMotionPlusData(
+                            new byte[] { b[17], b[18], b[19], b[20], b[21], b[22]});
+                    // Log.write("Button + Acc + Ext");
+                }
+
+                // retrieve raw data answers on channel 21
+                else if((b[1] & 0xFF) == 0x21) {
+                    this.handleButtonData(b[2], b[3]);
+
+                    // calibration data
+                    if(   ((b[5] & 0xFF) == 0x00)
+                       && ((b[6] & 0xFF) == 0x20)) {
+                       this.handleCalibrationData(
+                               new byte[] {b[7], b[8], b[9], b[11], b[12], b[13]});
+                       // Log.write("Calibration result");
+                    } else {
+                        this.handleRawDataAnswer(
+                                new byte[] {b[5], b[6]},
+                                new byte[] {b[7], b[8], b[9], b[10], b[11], b[12],
+                                b[13], b[14], b[15], b[16], b[17], b[18], b[19], b[20],
+                                b[21], b[22]
+                        });
+                        // Log.write("Raw data answer");
+                    }
+
+                }
+
+                // only extension data
+                else if((b[1] & 0xFF) == (byte)0x3d) {
+                    Log.write("Ext only");
+                }
+
+                else {
+                    Log.write("Unknown data retrieved.");
+                    this.printBytes(b);
+                }
+
 
 
 			} // while(running)
@@ -127,7 +180,51 @@ public class WiimoteStreamer extends Thread {
 		Log.write("Autocalibration successful!");
     }
 
-    private void handleInfraredDate(byte[] data) {
+    private void handleRawDataAnswer(byte[] offset, byte[] data) {
+        String out = "";
+        String[] o = this.byte2hex(offset);
+        String[] d = this.byte2hex(data);
+        out += "READ "+o[0]+""+o[1]+": ";
+        for(int i=0; i<d.length; i++) {
+            out += d[i]+" ";
+        }
+        Log.write(out);
+    }
+
+    private void handleWiiMotionPlusData(byte[] data) {
+
+        // fixed values until calibration procedure is known
+        int psi0 = 33604;
+        int theta0 = 32264;
+        int phi0 = 31450;
+
+        //this.printBytes(new byte[]{ data[3], data[4], data[5]});
+
+        int psiL = (data[0] & 0xFF);
+        int thetaL = (data[1] & 0xFF);
+        int phiL = (data[2] & 0xFF);
+
+        int psiU = (data[3] & 0xFF);
+        int thetaU = (data[4] & 0xFF);
+        int phiU = (data[5] & 0xFF);
+
+        // shift upper value
+        psiU = psiU << 8;
+        thetaU = thetaU << 8;
+        phiU = phiU << 8;
+        
+        int psi = psiU + psiL;
+        int theta = thetaU + thetaL;
+        int phi = phiU + phiL;
+
+        //Log.write("psi="+psi+" theta="+theta+" phi"+phi);
+
+        this.wiimote.fireRotationSpeedEvent(new
+                double[] { psi - psi0, theta - theta0, phi - phi0 });
+
+    }
+
+    private void handleInfraredData(byte[] data) {
         int[][] coordinates = new int[4][2];
 		int[] size = new int[4];
 		int j = 0;
@@ -276,7 +373,7 @@ public class WiimoteStreamer extends Thread {
     }
 
 	private byte[] getRaw() throws IOException {
-		byte[] b = new byte[19];
+		byte[] b = new byte[23];
 		this.receiveCon.receive(b);
 		return b;
 	}
@@ -291,6 +388,15 @@ public class WiimoteStreamer extends Thread {
 	protected boolean isRunning() {
 		return this.running;
 	}
+
+    private void printBytes(byte[] b) {
+        String out = "";
+        String[] s = this.byte2hex(b);
+        for(int i=0; i<s.length; i++) {
+            out += " "+s[i];
+        }
+        Log.write(out);
+    }
 
 	private String[] byte2hex(byte[] b) {
 		String[] out = new String[b.length];

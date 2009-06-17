@@ -40,12 +40,17 @@ public class HighPassFilter extends Filter {
     public HighPassFilter() {
         super();
         this.factor = 0.1;
-        this.prevAcc = new double[] {0.0, 0.0, 0.0};
+        this.reset();
     }
 
     public HighPassFilter(double factor) {
         super();
         this.factor = factor;
+        this.reset();
+    }
+
+    @Override
+    public void reset() {
         this.prevAcc = new double[] {0.0, 0.0, 0.0};
     }
 

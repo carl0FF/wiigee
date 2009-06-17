@@ -1,6 +1,6 @@
 /*
  * wiigee - accelerometerbased gesture recognition
- * Copyright (C) 2007, 2008 Benjamin Poppinga
+ * Copyright (C) 2007, 2008, 2009 Benjamin Poppinga
  * 
  * Developed at University of Oldenburg
  * Contact: benjamin.poppinga@informatik.uni-oldenburg.de
@@ -45,17 +45,19 @@ public class Device {
 	protected boolean accelerationenabled;
 	
 	// Filters, can filter the data stream
-	protected Vector<Filter> filters = new Vector<Filter>();
+	protected Vector<Filter> accfilters = new Vector<Filter>();
 	
 	// Listeners, receive generated events
-	protected Vector<DeviceListener> devicelistener = new Vector<DeviceListener>();
+	protected Vector<AccelerationListener> accelerationlistener = new Vector<AccelerationListener>();
+    protected Vector<ButtonListener> buttonlistener = new Vector<ButtonListener>();
 	protected ProcessingUnit processingunit = new TriggeredProcessingUnit();
 	
 	public Device() {
 		this.addFilter(new IdleStateFilter());
 		this.addFilter(new MotionDetectFilter(this));
 		this.addFilter(new DirectionalEquivalenceFilter());
-		this.addDeviceListener(this.processingunit);
+		this.addAccelerationListener(this.processingunit);
+        this.addButtonListener(this.processingunit);
 	}
 	
 	/**
@@ -63,31 +65,35 @@ public class Device {
 	 * @param filter The Filter instance.
 	 */
 	public void addFilter(Filter filter) {
-		this.filters.add(filter);
+		this.accfilters.add(filter);
 	}
 	
 	/**
-	 * Resets all the filters, which are resetable.
+	 * Resets all the accfilters, which are resetable.
 	 * Sometimes they have to be resettet if a new gesture starts.
 	 */
 	public void resetFilters() {
-		for(int i=0; i<this.filters.size(); i++) {
-			this.filters.elementAt(i).reset();
+		for(int i=0; i<this.accfilters.size(); i++) {
+			this.accfilters.elementAt(i).reset();
 		}
 	}
 	
 	/**
-	 * Adds an WiimoteListener to the wiimote. Everytime an action
-	 * on the wiimote is performed the WiimoteListener would receive
+	 * Adds an AccelerationListener to the Device. Everytime an acceleration
+	 * on the Device is performed the AccelerationListener would receive
 	 * an event of this action.
 	 * 
 	 */
-	public void addDeviceListener(DeviceListener listener) {
-		this.devicelistener.add(listener);
+	public void addAccelerationListener(AccelerationListener listener) {
+		this.accelerationlistener.add(listener);
 	}
-	
+
+    public void addButtonListener(ButtonListener listener) {
+        this.buttonlistener.add(listener);
+    }
+
 	/**
-	 * Adds a GestureListener to the wiimote. Everytime a gesture
+	 * Adds a GestureListener to the Device. Everytime a gesture
 	 * is performed the GestureListener would receive an event of
 	 * this gesture.
 	 */
@@ -146,17 +152,13 @@ public class Device {
 	// ###### Event-Methoden
 	
 	/** Fires an acceleration event.
-	 * @param x
-	 * 		Acceleration in x direction
-	 * @param y
-	 * 		Acceleration in y direction
-	 * @param z
-	 * 		Acceleration in z direction
+	 * @param vector Consists of three values:
+     * acceleration on X, Y and Z axis.
 	 */
 	public void fireAccelerationEvent(double[] vector) {
-		for(int i=0; i<this.filters.size(); i++) {
-			vector = this.filters.get(i).filter(vector);
-			// cannot return here if null, because of time-dependent filters
+		for(int i=0; i<this.accfilters.size(); i++) {
+			vector = this.accfilters.get(i).filter(vector);
+			// cannot return here if null, because of time-dependent accfilters
 		}
 		
 		// don't need to create an event if filtered away
@@ -167,8 +169,8 @@ public class Device {
 		
 			AccelerationEvent w = new AccelerationEvent(this,
 					vector[0], vector[1], vector[2], absvalue);
-			for(int i=0; i<this.devicelistener.size(); i++) {
-				this.devicelistener.get(i).accelerationReceived(w);
+			for(int i=0; i<this.accelerationlistener.size(); i++) {
+				this.accelerationlistener.get(i).accelerationReceived(w);
 			}
 		}
 
@@ -180,8 +182,8 @@ public class Device {
 	 */
 	public void fireButtonPressedEvent(int button) {
 		ButtonPressedEvent w = new ButtonPressedEvent(this, button);
-		for(int i=0; i<this.devicelistener.size(); i++) {
-			this.devicelistener.get(i).buttonPressReceived(w);
+		for(int i=0; i<this.buttonlistener.size(); i++) {
+			this.buttonlistener.get(i).buttonPressReceived(w);
 		}
 		
 		if(w.isRecognitionInitEvent() || w.isTrainInitEvent()) {
@@ -193,8 +195,8 @@ public class Device {
 	 */
 	public void fireButtonReleasedEvent() {
 		ButtonReleasedEvent w = new ButtonReleasedEvent(this);
-		for(int i=0; i<this.devicelistener.size(); i++) {
-			this.devicelistener.get(i).buttonReleaseReceived(w);
+		for(int i=0; i<this.buttonlistener.size(); i++) {
+			this.buttonlistener.get(i).buttonReleaseReceived(w);
 		}
 	}
 	
@@ -203,8 +205,8 @@ public class Device {
 	 */
 	public void fireMotionStartEvent() {
 		MotionStartEvent w = new MotionStartEvent(this);
-		for(int i=0; i<this.devicelistener.size(); i++) {
-			this.devicelistener.get(i).motionStartReceived(w);
+		for(int i=0; i<this.accelerationlistener.size(); i++) {
+			this.accelerationlistener.get(i).motionStartReceived(w);
 		}
 	}
 	
@@ -213,8 +215,8 @@ public class Device {
 	 */
 	public void fireMotionStopEvent() {
 		MotionStopEvent w = new MotionStopEvent(this);
-		for(int i=0; i<this.devicelistener.size(); i++) {
-			this.devicelistener.get(i).motionStopReceived(w);
+		for(int i=0; i<this.accelerationlistener.size(); i++) {
+			this.accelerationlistener.get(i).motionStopReceived(w);
 		}
 	}	
 	

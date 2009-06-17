@@ -1,6 +1,6 @@
 /*
  * wiigee - accelerometerbased gesture recognition
- * Copyright (C) 2007, 2008 Benjamin Poppinga
+ * Copyright (C) 2007, 2008, 2009 Benjamin Poppinga
  * 
  * Developed at University of Oldenburg
  * Contact: benjamin.poppinga@informatik.uni-oldenburg.de
@@ -29,7 +29,7 @@ import org.wiigee.event.*;
 import org.wiigee.util.Log;
 
 /**
- * This class analyzes the WiimoteAccelerationEvents emitted from a Wiimote
+ * This class analyzes the AccelerationEvents emitted from a Wiimote
  * and further creates and manages the different models for each type
  * of gesture. 
  * 
@@ -80,11 +80,6 @@ public class TriggeredProcessingUnit extends ProcessingUnit {
 
 	public void buttonReleaseReceived(ButtonReleasedEvent event) {
 		this.handleStopEvent(event);
-	}
-	
-	@Override
-	public void infraredReceived(InfraredEvent event) {
-		// NOTHING TO DO HERE	
 	}
 	
 	public void motionStartReceived(MotionStartEvent event) {

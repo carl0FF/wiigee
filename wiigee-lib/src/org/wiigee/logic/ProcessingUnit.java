@@ -5,16 +5,16 @@ import java.util.Vector;
 import org.wiigee.event.AccelerationEvent;
 import org.wiigee.event.ButtonPressedEvent;
 import org.wiigee.event.ButtonReleasedEvent;
-import org.wiigee.event.DeviceListener;
+import org.wiigee.event.AccelerationListener;
+import org.wiigee.event.ButtonListener;
 import org.wiigee.event.GestureEvent;
 import org.wiigee.event.GestureListener;
-import org.wiigee.event.InfraredEvent;
 import org.wiigee.event.MotionStartEvent;
 import org.wiigee.event.MotionStopEvent;
 import org.wiigee.event.StateEvent;
 import org.wiigee.util.Log;
 
-public abstract class ProcessingUnit implements DeviceListener {
+public abstract class ProcessingUnit implements AccelerationListener, ButtonListener {
 
 	// Classifier
 	protected Classifier classifier;
@@ -56,8 +56,6 @@ public abstract class ProcessingUnit implements DeviceListener {
 	public abstract void buttonPressReceived(ButtonPressedEvent event);
 
 	public abstract void buttonReleaseReceived(ButtonReleasedEvent event);
-
-	public abstract void infraredReceived(InfraredEvent event);
 
 	public abstract void motionStartReceived(MotionStartEvent event);
 

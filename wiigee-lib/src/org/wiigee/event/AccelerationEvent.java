@@ -1,6 +1,6 @@
 /*
  * wiigee - accelerometerbased gesture recognition
- * Copyright (C) 2007, 2008 Benjamin Poppinga
+ * Copyright (C) 2007, 2008, 2009 Benjamin Poppinga
  * 
  * Developed at University of Oldenburg
  * Contact: benjamin.poppinga@informatik.uni-oldenburg.de
@@ -32,7 +32,7 @@ import org.wiigee.device.*;
  * This Event would be generated if an acceleration has been detected.
  * It contains information about the force applied to the device in each
  * direction (x, y, z). Further it contains the absolute value of this
- * vector and the source which generated this event (wiimote).
+ * vector and the source which generated this event (Device).
  *
  * @author Benjamin 'BePo' Poppinga
  * 
@@ -41,10 +41,9 @@ public class AccelerationEvent extends EventObject {
 	
 	double X, Y, Z;
 	double absvalue;
-	Device source;
 	
 	/**
-	 * Create a WiimoteAccelerationEvent with a specific source,
+	 * Create an AccelerationEvent with a specific source,
 	 * all the three acceleration values and the calculated absolute
 	 * value.
 	 * 
@@ -56,15 +55,10 @@ public class AccelerationEvent extends EventObject {
 	 */
 	public AccelerationEvent(Device source, double X, double Y, double Z, double absvalue) {
 		super(source);
-		this.source=source;
 		this.X=X;
 		this.Y=Y;
 		this.Z=Z;
 		this.absvalue=absvalue;
-	}
-	
-	public Device getSource() {
-		return source;
 	}
 
 	public double getX() {

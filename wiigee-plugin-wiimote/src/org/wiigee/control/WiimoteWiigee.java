@@ -31,7 +31,7 @@ import javax.bluetooth.LocalDevice;
 
 import org.wiigee.util.Log;
 import org.wiigee.device.Wiimote;
-import org.wiigee.event.DeviceListener;
+import org.wiigee.event.AccelerationListener;
 import org.wiigee.event.GestureListener;
 import org.wiigee.filter.Filter;
 
@@ -169,9 +169,9 @@ public class WiimoteWiigee extends Wiigee {
         }
     }
 
-    public void addDeviceListener(DeviceListener listener) {
+    public void addDeviceListener(AccelerationListener listener) {
         for (int i = 0; i < this.devices.size(); i++) {
-            this.devices.elementAt(i).addDeviceListener(listener);
+            this.devices.elementAt(i).addAccelerationListener(listener);
         }
     }
 

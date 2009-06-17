@@ -25,14 +25,6 @@
 package org.wiigee.filter;
 
 public abstract class Filter {
-
-	public Filter() {
-		// nothing, but should be called via SUPER.
-	}
-	
-	public void reset() {
-		// reset filter, if necessary.
-	}
 	
 	/***
 	 * The actual called method to filter anything. It checks if the vector is
@@ -59,5 +51,7 @@ public abstract class Filter {
 	 * @return
 	 */
 	abstract public double[] filterAlgorithm(double[] vector);
+
+    abstract public void reset();
 	
 }

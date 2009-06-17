@@ -22,21 +22,33 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package org.wiigee.control;
+package org.wiigee.event;
 
-import org.wiigee.util.Log;
+import java.util.EventObject;
+import org.wiigee.device.Device;
 
-/**
- *
- * @author bepo
- */
-public class Wiigee {
+public class RotationSpeedEvent extends EventObject {
 
-    protected static String version = "1.5 alpha";
-    protected static String releasedate = "20090617";
+	protected double psi;
+    protected double theta;
+    protected double phi;
 
-    protected Wiigee() {
-        Log.write("This is wiigee version "+version+" ("+releasedate+")");
+	public RotationSpeedEvent(Device source, double psi, double theta, double phi) {
+        super(source);
+		this.psi = psi;
+        this.theta = theta;
+        this.phi = phi;
+	}
+
+    public double getPsi() {
+        return this.psi;
     }
-    
+
+    public double getTheta() {
+        return this.theta;
+    }
+
+    public double getPhi() {
+        return this.phi;
+    }
 }

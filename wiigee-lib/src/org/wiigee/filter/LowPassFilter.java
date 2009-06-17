@@ -40,12 +40,17 @@ public class LowPassFilter extends Filter {
     public LowPassFilter() {
         super();
         this.factor = 0.01;
-        this.prevAcc = new double[] {0.0, 0.0, 0.0};
+        this.reset();
     }
 
     public LowPassFilter(double factor) {
         super();
         this.factor = factor;
+        this.reset();
+    }
+
+    @Override
+    public void reset() {
         this.prevAcc = new double[] {0.0, 0.0, 0.0};
     }
 

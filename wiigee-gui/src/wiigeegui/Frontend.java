@@ -15,30 +15,27 @@ import org.wiigee.device.Wiimote;
 import org.wiigee.event.AccelerationEvent;
 import org.wiigee.event.ButtonPressedEvent;
 import org.wiigee.event.ButtonReleasedEvent;
-import org.wiigee.event.DeviceListener;
+import org.wiigee.event.AccelerationListener;
 import org.wiigee.event.GestureEvent;
 import org.wiigee.event.GestureListener;
-import org.wiigee.event.InfraredEvent;
 import org.wiigee.event.MotionStartEvent;
 import org.wiigee.event.MotionStopEvent;
+import org.wiigee.event.RotationEvent;
+import org.wiigee.event.RotationSpeedEvent;
 import org.wiigee.event.StateEvent;
-import org.wiigee.filter.HighPassFilter;
-import org.wiigee.filter.LowPassFilter;
-import org.wiigee.filter.VelocityFilter;
 import java.awt.Color;
-import java.awt.Component;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JLabel;
 import javax.swing.filechooser.FileFilter;
+import org.wiigee.event.ButtonListener;
+import org.wiigee.event.RotationListener;
 import org.wiigee.util.Log;
 
 
@@ -46,7 +43,8 @@ import org.wiigee.util.Log;
  *
  * @author bepo
  */
-public class Frontend extends javax.swing.JFrame implements GestureListener, DeviceListener {
+public class Frontend extends javax.swing.JFrame implements GestureListener,
+        AccelerationListener, ButtonListener, RotationListener {
 
     private WiimoteWiigee wiigee;
     private Wiimote wiimote;
@@ -105,8 +103,14 @@ public class Frontend extends javax.swing.JFrame implements GestureListener, Dev
         this.inMotionField.setBackground(Color.WHITE);
     }
 
-    public void infraredReceived(InfraredEvent event) {
-        // throw new UnsupportedOperationException("Not supported yet.");
+    public void rotationSpeedReceived(RotationSpeedEvent event) {
+        Log.write("Rotspeed: psi="+event.getPsi()+
+                " theta="+event.getTheta()+
+                " phi="+event.getPhi());
+    }
+
+    public void rotationReceived(RotationEvent event) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     public void appendToConsole(String s) {
@@ -547,7 +551,17 @@ public class Frontend extends javax.swing.JFrame implements GestureListener, Dev
     }//GEN-LAST:event_loadGesturesItemActionPerformed
 
     private void setupWiimote() {
-        this.wiimote.addDeviceListener(this);
+        try {
+            this.wiimote.disableAccelerationSensors();
+            this.wiimote.enableWiiMotionPlus();
+            } catch(Exception e) {
+                Log.write("Grosser Mist: setupWiimote()");
+                e.printStackTrace();
+            }
+
+        this.wiimote.addAccelerationListener(this);
+        this.wiimote.addButtonListener(this);
+        this.wiimote.addRotationListener(this);
         this.wiimote.addGestureListener(this);
     }
 
@@ -581,4 +595,5 @@ public class Frontend extends javax.swing.JFrame implements GestureListener, Dev
     private wiigeegui.WiimotePanel wiimotePanel1;
     private javax.swing.JTextField wiimotesMacTextField;
     // End of variables declaration//GEN-END:variables
+
 }

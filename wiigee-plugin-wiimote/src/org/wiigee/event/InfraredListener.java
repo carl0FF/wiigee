@@ -22,21 +22,16 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package org.wiigee.control;
+package org.wiigee.event;
 
-import org.wiigee.util.Log;
+import java.util.EventListener;
 
 /**
  *
- * @author bepo
+ * @author Benjamin 'BePo' Poppinga
  */
-public class Wiigee {
+public interface InfraredListener extends EventListener {
 
-    protected static String version = "1.5 alpha";
-    protected static String releasedate = "20090617";
+    public abstract void infraredReceived(InfraredEvent event);
 
-    protected Wiigee() {
-        Log.write("This is wiigee version "+version+" ("+releasedate+")");
-    }
-    
 }
