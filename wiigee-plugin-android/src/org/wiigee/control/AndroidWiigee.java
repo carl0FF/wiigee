@@ -42,8 +42,8 @@ import org.wiigee.util.Log;
 public class AndroidWiigee extends Wiigee {
 
     // Version information
-    protected static String pluginversion = "1.0 alpha";
-    protected static String pluginreleasedate = "20090529";
+    protected static String pluginversion = "1.0.1 alpha";
+    protected static String pluginreleasedate = "20090625";
 
     // Device
     private AndroidDevice device;

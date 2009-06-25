@@ -32,8 +32,8 @@ import org.wiigee.util.Log;
  */
 public class Wiigee {
 
-    protected static String version = "1.5.1 alpha";
-    protected static String releasedate = "20090619";
+    protected static String version = "1.5.2 alpha";
+    protected static String releasedate = "20090625";
 
     protected Wiigee() {
         Log.write("This is wiigee version "+version+" ("+releasedate+")");
