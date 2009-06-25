@@ -3,7 +3,7 @@
  * Copyright (C) 2007, 2008, 2009 Benjamin Poppinga
  *
  * Developed at University of Oldenburg
- * Contact: benjamin.poppinga@informatik.uni-oldenburg.de
+ * Contact: wiigee@benjaminpoppinga.de
  *
  * This file is part of wiigee.
  *
@@ -32,8 +32,8 @@ import org.wiigee.util.Log;
  */
 public class Wiigee {
 
-    protected static String version = "1.5 alpha";
-    protected static String releasedate = "20090617";
+    protected static String version = "1.5.1 alpha";
+    protected static String releasedate = "20090619";
 
     protected Wiigee() {
         Log.write("This is wiigee version "+version+" ("+releasedate+")");

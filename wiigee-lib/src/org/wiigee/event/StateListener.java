@@ -1,7 +1,7 @@
 /*
  * wiigee - accelerometerbased gesture recognition
  * Copyright (C) 2007, 2008, 2009 Benjamin Poppinga
- *
+ * 
  * Developed at University of Oldenburg
  * Contact: wiigee@benjaminpoppinga.de
  *
@@ -16,7 +16,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -24,32 +24,26 @@
 
 package org.wiigee.event;
 
-import java.util.EventObject;
-import org.wiigee.device.Device;
+import java.util.EventListener;
 
-public class RotationEvent extends EventObject {
-
-    protected double pitch;
-	protected double yaw;
-    protected double roll;
-
-	public RotationEvent(Device source, double pitch, double roll, double yaw) {
-		super(source);
-        this.pitch = pitch;
-        this.roll = roll;
-        this.yaw = yaw;
-	}
-
-    public double getPitch() {
-        return this.pitch;
-    }
-
-    public double getYaw() {
-        return this.yaw;
-    }
-
-    public double getRoll() {
-        return this.roll;
-    }
-
+/**
+ * 
+ * This is the StateListener interface which has to be implemented
+ * by any application which should receive recognized statechanges.
+ * 
+ * @author Benjamin 'BePo' Poppinga
+ * 
+ */
+public interface StateListener extends EventListener {
+	
+	/**
+	 * This method would be called if the gesture-recognizing system
+	 * switched the state from recognition to training or otherwise.
+	 * 
+	 * @param event The StateEvent containing information about the
+	 * state-change.
+	 */
+	public abstract void stateReceived(StateEvent event);
+	
+	
 }

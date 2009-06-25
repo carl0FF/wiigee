@@ -36,15 +36,17 @@ import java.util.logging.Logger;
 import javax.swing.filechooser.FileFilter;
 import org.wiigee.event.ButtonListener;
 import org.wiigee.event.RotationListener;
+import org.wiigee.event.StateListener;
+import org.wiigee.filter.HighPassFilter;
+import org.wiigee.filter.RotationThresholdFilter;
 import org.wiigee.util.Log;
-
 
 /**
  *
  * @author bepo
  */
 public class Frontend extends javax.swing.JFrame implements GestureListener,
-        AccelerationListener, ButtonListener, RotationListener {
+        AccelerationListener, StateListener, ButtonListener, RotationListener {
 
     private WiimoteWiigee wiigee;
     private Wiimote wiimote;
@@ -84,8 +86,13 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
         }
 
         if(event.getButton()==Wiimote.BUTTON_MINUS) {
-            Log.write("FILTER RESET!");
-            this.wiimote.resetFilters();
+            Log.write("ACC FILTER RESET!");
+            this.wiimote.resetAccelerationFilters();
+        }
+
+        if(event.getButton()==Wiimote.BUTTON_PLUS) {
+            Log.write("ROT FILTER RESET!");
+            this.wiimote.resetRotationFilters();
         }
     }
 
@@ -104,13 +111,13 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
     }
 
     public void rotationSpeedReceived(RotationSpeedEvent event) {
-        Log.write("Rotspeed: psi="+event.getPsi()+
-                " theta="+event.getTheta()+
-                " phi="+event.getPhi());
+        //Log.write("Rotspeed: psi="+event.getPsi()+
+        //        " theta="+event.getTheta()+
+        //        " phi="+event.getPhi());
     }
 
     public void rotationReceived(RotationEvent event) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.orientationPanel1.setRotation(event);
     }
 
     public void appendToConsole(String s) {
@@ -146,6 +153,7 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
         trainingField = new javax.swing.JTextField();
         gestureField = new javax.swing.JTextField();
         wiimotePanel1 = new wiigeegui.WiimotePanel();
+        orientationPanel1 = new wiigeegui.OrientationPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
         wiimoteMenu = new javax.swing.JMenu();
         connectWiimoteItem = new javax.swing.JMenuItem();
@@ -288,7 +296,7 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Wiigee Demo-GUI");
+        setTitle("wiigee Demo-GUI");
         setLocationByPlatform(true);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
@@ -310,7 +318,7 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
         graphPanel1.setLayout(graphPanel1Layout);
         graphPanel1Layout.setHorizontalGroup(
             graphPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 417, Short.MAX_VALUE)
+            .add(0, 421, Short.MAX_VALUE)
         );
         graphPanel1Layout.setVerticalGroup(
             graphPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -403,17 +411,18 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(wiimotePanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(consoleScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 419, Short.MAX_VALUE)
-                    .add(gestureField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 419, Short.MAX_VALUE)
+                    .add(orientationPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 423, Short.MAX_VALUE)
+                    .add(consoleScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 423, Short.MAX_VALUE)
+                    .add(gestureField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 423, Short.MAX_VALUE)
                     .add(graphPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                        .add(inMotionField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
+                        .add(inMotionField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(recognitionField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
+                        .add(recognitionField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 145, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(trainingField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 115, Short.MAX_VALUE)))
+                        .add(trainingField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -432,7 +441,9 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(gestureField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 40, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(consoleScrollPane)))
+                        .add(orientationPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(consoleScrollPane, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 99, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -509,7 +520,7 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
     private void connectWiimoteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectWiimoteButtonActionPerformed
         try { // manual connect: 001E350F40BA
             this.selectWiimoteDialog.setVisible(false);
-            this.wiimote = new Wiimote(this.wiimotesMacTextField.getText(), true, true);
+            this.wiimote = new Wiimote(this.wiimotesMacTextField.getText(), false, true);
             this.setupWiimote();
         } catch (IOException ex) {
             Logger.getLogger(Frontend.class.getName()).log(Level.SEVERE, null, ex);
@@ -554,6 +565,8 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
         try {
             this.wiimote.disableAccelerationSensors();
             this.wiimote.enableWiiMotionPlus();
+            this.wiimote.addAccelerationFilter(new HighPassFilter());
+            this.wiimote.addRotationFilter(new RotationThresholdFilter(2.0));
             } catch(Exception e) {
                 Log.write("Grosser Mist: setupWiimote()");
                 e.printStackTrace();
@@ -563,6 +576,7 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
         this.wiimote.addButtonListener(this);
         this.wiimote.addRotationListener(this);
         this.wiimote.addGestureListener(this);
+        this.wiimote.getProcessingUnit().addStateListener(this);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -583,6 +597,7 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
     private javax.swing.JLabel jLabel2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem loadGesturesItem;
+    private wiigeegui.OrientationPanel orientationPanel1;
     private javax.swing.JTextField recognitionField;
     private javax.swing.JMenuItem saveGesturesItem;
     private javax.swing.JButton scanWiimoteApproveButton;

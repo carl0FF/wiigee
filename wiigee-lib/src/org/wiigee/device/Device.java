@@ -3,7 +3,7 @@
  * Copyright (C) 2007, 2008, 2009 Benjamin Poppinga
  * 
  * Developed at University of Oldenburg
- * Contact: benjamin.poppinga@informatik.uni-oldenburg.de
+ * Contact: wiigee@benjaminpoppinga.de
  *
  * This file is part of wiigee.
  *
@@ -52,10 +52,12 @@ public class Device {
     protected Vector<ButtonListener> buttonlistener = new Vector<ButtonListener>();
 	protected ProcessingUnit processingunit = new TriggeredProcessingUnit();
 	
-	public Device() {
-		this.addFilter(new IdleStateFilter());
-		this.addFilter(new MotionDetectFilter(this));
-		this.addFilter(new DirectionalEquivalenceFilter());
+	public Device(boolean autofiltering) {
+        if(autofiltering) {
+            this.addAccelerationFilter(new IdleStateFilter());
+            this.addAccelerationFilter(new MotionDetectFilter(this));
+            this.addAccelerationFilter(new DirectionalEquivalenceFilter());
+        }
 		this.addAccelerationListener(this.processingunit);
         this.addButtonListener(this.processingunit);
 	}
@@ -64,7 +66,7 @@ public class Device {
 	 * Adds a Filter for processing the acceleration values.
 	 * @param filter The Filter instance.
 	 */
-	public void addFilter(Filter filter) {
+	public void addAccelerationFilter(Filter filter) {
 		this.accfilters.add(filter);
 	}
 	
@@ -72,7 +74,7 @@ public class Device {
 	 * Resets all the accfilters, which are resetable.
 	 * Sometimes they have to be resettet if a new gesture starts.
 	 */
-	public void resetFilters() {
+	public void resetAccelerationFilters() {
 		for(int i=0; i<this.accfilters.size(); i++) {
 			this.accfilters.elementAt(i).reset();
 		}
@@ -82,12 +84,20 @@ public class Device {
 	 * Adds an AccelerationListener to the Device. Everytime an acceleration
 	 * on the Device is performed the AccelerationListener would receive
 	 * an event of this action.
-	 * 
+	 *
+     * @param listener The Listener.
 	 */
 	public void addAccelerationListener(AccelerationListener listener) {
 		this.accelerationlistener.add(listener);
 	}
 
+    /**
+     * Adds a ButtonListener to the Device. Everytime a Button has been
+     * pressed or released, the Listener would be notified about this via
+     * the corresponding Events.
+     *
+     * @param listener The Listener.
+     */
     public void addButtonListener(ButtonListener listener) {
         this.buttonlistener.add(listener);
     }
@@ -96,6 +106,8 @@ public class Device {
 	 * Adds a GestureListener to the Device. Everytime a gesture
 	 * is performed the GestureListener would receive an event of
 	 * this gesture.
+     *
+     * @param listener The Listener.
 	 */
 	public void addGestureListener(GestureListener listener) {
 		this.processingunit.addGestureListener(listener);
@@ -187,7 +199,7 @@ public class Device {
 		}
 		
 		if(w.isRecognitionInitEvent() || w.isTrainInitEvent()) {
-			this.resetFilters();
+			this.resetAccelerationFilters();
 		}
 	}
 	

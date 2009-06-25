@@ -12,6 +12,7 @@ import org.wiigee.event.GestureListener;
 import org.wiigee.event.MotionStartEvent;
 import org.wiigee.event.MotionStopEvent;
 import org.wiigee.event.StateEvent;
+import org.wiigee.event.StateListener;
 import org.wiigee.util.Log;
 
 public abstract class ProcessingUnit implements AccelerationListener, ButtonListener {
@@ -20,7 +21,8 @@ public abstract class ProcessingUnit implements AccelerationListener, ButtonList
 	protected Classifier classifier;
 	
 	// Listener
-	private Vector<GestureListener> listen = new Vector<GestureListener>();
+	private Vector<GestureListener> gesturelistener = new Vector<GestureListener>();
+    private Vector<StateListener> statelistener = new Vector<StateListener>();
 	
 	
 	public ProcessingUnit() {
@@ -28,26 +30,35 @@ public abstract class ProcessingUnit implements AccelerationListener, ButtonList
 	}
 	
 	/** 
-	 * Add an GestureListener to receive Gesture/StateEvents.
+	 * Add an GestureListener to receive GestureEvents.
 	 * 
 	 * @param g
-	 * 	Class which implements GestureListener interface
+	 * 	Class which implements GestureListener interface.
 	 */
 	public void addGestureListener(GestureListener g) {
-		this.listen.add(g);
+		this.gesturelistener.add(g);
 	}
+
+    /**
+     * Adds a StateListener to receive StateEvents.
+     *
+     * @param s Class which implements the StateListener interface.
+     */
+    public void addStateListener(StateListener s) {
+        this.statelistener.add(s);
+    }
 	
 	protected void fireGestureEvent(int id, double probability) {
 		GestureEvent w = new GestureEvent(this, id, probability);
-		for(int i=0; i<this.listen.size(); i++) {
-			this.listen.get(i).gestureReceived(w);
+		for(int i=0; i<this.gesturelistener.size(); i++) {
+			this.gesturelistener.get(i).gestureReceived(w);
 		}
 	}
 	
 	protected void fireStateEvent(int state) {
 		StateEvent w = new StateEvent(this, state);
-		for(int i=0; i<this.listen.size(); i++) {
-			this.listen.get(i).stateReceived(w);
+		for(int i=0; i<this.statelistener.size(); i++) {
+			this.statelistener.get(i).stateReceived(w);
 		}
 	}
 	

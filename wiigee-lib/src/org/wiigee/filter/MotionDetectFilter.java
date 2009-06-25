@@ -1,9 +1,9 @@
 /*
  * wiigee - accelerometerbased gesture recognition
- * Copyright (C) 2007, 2008 Benjamin Poppinga
+ * Copyright (C) 2007, 2008, 2009 Benjamin Poppinga
  * 
  * Developed at University of Oldenburg
- * Contact: benjamin.poppinga@informatik.uni-oldenburg.de
+ * Contact: wiigee@benjaminpoppinga.de
  *
  * This file is part of wiigee.
  *

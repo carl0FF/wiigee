@@ -1,9 +1,9 @@
 /*
  * wiigee - accelerometerbased gesture recognition
- * Copyright (C) 2007, 2008 Benjamin Poppinga
+ * Copyright (C) 2007, 2008, 2009 Benjamin Poppinga
  * 
  * Developed at University of Oldenburg
- * Contact: benjamin.poppinga@informatik.uni-oldenburg.de
+ * Contact: wiigee@benjaminpoppinga.de
  *
  * This file is part of wiigee.
  *
@@ -43,15 +43,5 @@ public interface GestureListener extends EventListener {
 	 * the recognized gesture.
 	 */
 	public abstract void gestureReceived(GestureEvent event);
-	
-	/**
-	 * This method would be called if the gesture-recognizing system
-	 * switched the state from recognition to training or otherwise.
-	 * 
-	 * @param event The StateEvent containing information about the
-	 * state-change.
-	 */
-	public abstract void stateReceived(StateEvent event);
-	
 	
 }

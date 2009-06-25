@@ -3,7 +3,7 @@
  * Copyright (C) 2007, 2008, 2009 Benjamin Poppinga
  * 
  * Developed at University of Oldenburg
- * Contact: benjamin.poppinga@informatik.uni-oldenburg.de
+ * Contact: wiigee@benjaminpoppinga.de
  *
  * This file is part of wiigee.
  *
@@ -24,18 +24,14 @@
 
 package org.wiigee.device;
 
-import org.wiigee.event.InfraredEvent;
-import org.wiigee.device.*;
 import java.io.IOException;
 import java.util.Random;
 import java.util.Vector;
 import javax.bluetooth.L2CAPConnection;
 import javax.microedition.io.Connector;
 import org.wiigee.event.*;
-import org.wiigee.filter.DirectionalEquivalenceFilter;
 import org.wiigee.filter.Filter;
-import org.wiigee.filter.HighPassFilter;
-import org.wiigee.filter.IdleStateFilter;
+import org.wiigee.filter.RotationThresholdFilter;
 import org.wiigee.util.Log;
 
 /**
@@ -91,7 +87,12 @@ public class Wiimote extends Device {
     // Listeners, receive generated events
 	protected Vector<InfraredListener> infraredlistener = new Vector<InfraredListener>();
     protected Vector<RotationListener> rotationListener = new Vector<RotationListener>();
-	
+
+    // keep track of the orientation
+    private double pitch = 0.0;
+    private double roll = 0.0;
+    private double yaw = 0.0;
+
 	// Functional
 	private boolean vibrating;
 	private boolean calibrated;
@@ -109,17 +110,12 @@ public class Wiimote extends Device {
      *          If set the wiimote would automatically be connected.
 	 */
     public Wiimote(String btaddress, boolean autofiltering, boolean autoconnect) throws IOException {
+        super(autofiltering);
         this.btaddress = this.removeChar(btaddress, ':');
         this.vibrating = false;
         this.setCloseGestureButton(Wiimote.BUTTON_HOME);
         this.setRecognitionButton(Wiimote.BUTTON_B);
         this.setTrainButton(Wiimote.BUTTON_A);
-
-        // automatic filtering enabled
-        if(autofiltering) {
-            this.addFilter(new IdleStateFilter());
-            this.addFilter(new DirectionalEquivalenceFilter());
-        }
 
         // automatic connect enabled
         if(autoconnect) {
@@ -188,13 +184,43 @@ public class Wiimote extends Device {
 		}
 	}
 
-
+    /**
+     * The added Listener will be notified about detected infrated
+     * events.
+     *
+     * @param listener The Listener to be added.
+     */
 	public void addInfraredListener(InfraredListener listener) {
 		this.infraredlistener.add(listener);
 	}
 
+    /**
+     * The added Listener will be notified about detected orientation
+     * changes.
+     *
+     * @param listener The Listener to be added.
+     */
     public void addRotationListener(RotationListener listener) {
         this.rotationListener.add(listener);
+    }
+
+    /**
+     * Adds a filter to process the rotation speed data of the
+     * wiimote with an attached Wii Motion Plus.
+     *
+     * @param filter The Filter to be added.
+     */
+    public void addRotationFilter(Filter filter) {
+        this.rotfilters.add(filter);
+    }
+
+    public void resetRotationFilters() {
+        this.yaw = 0.0;
+        this.pitch = 0.0;
+        this.roll = 0.0;
+        for(int i=0; i<this.rotfilters.size(); i++) {
+            this.rotfilters.elementAt(i).reset();
+        }
     }
 
 	/**
@@ -276,7 +302,7 @@ public class Wiimote extends Device {
 		if(this.controlCon!=null) {
 			this.controlCon.send(raw);
 			try {
-				Thread.sleep(20l);
+				Thread.sleep(30l);
 			} catch (InterruptedException e) {
 				System.out.println("sendRaw() interrupted");
 			}
@@ -305,13 +331,12 @@ public class Wiimote extends Device {
 	}
 	
 	/**
-	 * Initializes the calibration of the accerlarometer. This is done once
+	 * Initializes the calibration of the accerlerometer. This is done once
 	 * per each controller in program lifetime.
 	 * 
 	 * @throws IOException
 	 */
 	private void calibrateAccelerometer() throws IOException {
-		// calibration command
 		this.readEEPROM(new byte[] {0x00, 0x00, 0x20}, new byte[] {0x00, 0x07});
 		this.calibrated=true;
 	}
@@ -411,8 +436,7 @@ public class Wiimote extends Device {
 	 * the wiimote. You got to try which time in milliseconds would
 	 * fit your requirements.
 	 * 
-	 * @param milliseconds
-	 * 		time the wiimote would vibrate
+	 * @param milliseconds Time the wiimote would approx. vibrate.
 	 */
 	public void vibrateForTime(long milliseconds) throws IOException {
 		try {
@@ -434,10 +458,11 @@ public class Wiimote extends Device {
 	}
 
     /**
-	 * Fires a infrared event
+	 * Fires a infrared event, containig coordinate pairs (x,y) and a
+     * size of the detected IR spot.
 	 *
-	 * @param coordinates
-	 * @param size
+	 * @param coordinates X and Y display coordinates.
+	 * @param size The size of the spot.
 	 */
 	public void fireInfraredEvent(int[][] coordinates, int[] size) {
 		InfraredEvent w = new InfraredEvent(this, coordinates, size);
@@ -445,6 +470,22 @@ public class Wiimote extends Device {
 			this.infraredlistener.get(i).infraredReceived(w);
 		}
 	}
+
+
+    /**
+     * Fires the current relative orientation of the Wiimote to
+     * all RotationListeners.
+     *
+     * @param yaw Orientation around Z axis.
+     * @param roll Orientation around Y axis.
+     * @param pitch Orientation around X axis.
+     */
+    public void fireRotationEvent(double pitch, double roll, double yaw) {
+        RotationEvent w = new RotationEvent(this, pitch, roll, yaw);
+        for(int i=0; i<this.rotationListener.size(); i++) {
+            this.rotationListener.elementAt(i).rotationReceived(w);
+        }
+    }
 
     /**
      * If a Wii Motion Plus is attached and activated properly this
@@ -458,14 +499,22 @@ public class Wiimote extends Device {
      *  psi - Rotational speed of z axis (yaw)
      */
     public void fireRotationSpeedEvent(double[] vector) {
-		/*for(int i=0; i<this.accfilters.size(); i++) {
-			vector = this.accfilters.get(i).filter(vector);
-			// cannot return here if null, because of time-dependent accfilters
-		}*/
+		for(int i=0; i<this.rotfilters.size(); i++) {
+			vector = this.rotfilters.get(i).filter(vector);
+			// cannot return here if null, because of time-dependent filters
+		}
 
-        RotationSpeedEvent w = new RotationSpeedEvent(this, vector[0], vector[1], vector[2]);
-        for(int i=0; i<this.rotationListener.size(); i++) {
-            this.rotationListener.elementAt(i).rotationSpeedReceived(w);
+        if(vector!=null) {
+            RotationSpeedEvent w = new RotationSpeedEvent(this, vector[0], vector[1], vector[2]);
+            for(int i=0; i<this.rotationListener.size(); i++) {
+                this.rotationListener.elementAt(i).rotationSpeedReceived(w);
+            }
+
+            // update orientation with integration
+            this.pitch = this.pitch + vector[0] * 0.01;
+            this.roll = this.roll + vector[1] * 0.01;
+            this.yaw = this.yaw + vector[2] * 0.01;
+            this.fireRotationEvent(this.pitch, this.roll, this.yaw);
         }
     }
     

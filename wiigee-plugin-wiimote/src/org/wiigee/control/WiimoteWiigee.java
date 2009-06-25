@@ -1,9 +1,9 @@
 /*
  * wiigee - accelerometerbased gesture recognition
- * Copyright (C) 2007, 2008 Benjamin Poppinga
+ * Copyright (C) 2007, 2008, 2009 Benjamin Poppinga
  * 
  * Developed at University of Oldenburg
- * Contact: benjamin.poppinga@informatik.uni-oldenburg.de
+ * Contact: wiigee@benjaminpoppinga.de
  *
  * This file is part of wiigee.
  *
@@ -38,8 +38,8 @@ import org.wiigee.filter.Filter;
 // Singleton
 public class WiimoteWiigee extends Wiigee {
 
-    protected static String pluginversion = "1.5 alpha";
-    protected static String pluginreleasedate = "20090524";
+    protected static String pluginversion = "1.5.1 alpha";
+    protected static String pluginreleasedate = "20090619";
     private static final Object lock = new Object();
     private Vector<Wiimote> devices;
 
@@ -181,9 +181,9 @@ public class WiimoteWiigee extends Wiigee {
         }
     }
 
-    public void addFilter(Filter filter) {
+    public void addAccelerationFilter(Filter filter) {
         for (int i = 0; i < this.devices.size(); i++) {
-            this.devices.elementAt(i).addFilter(filter);
+            this.devices.elementAt(i).addAccelerationFilter(filter);
         }
     }
 }
