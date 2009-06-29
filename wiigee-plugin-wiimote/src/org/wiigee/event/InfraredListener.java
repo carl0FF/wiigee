@@ -27,6 +27,9 @@ package org.wiigee.event;
 import java.util.EventListener;
 
 /**
+ * Interface to implement if a class should receive InfraredEvents
+ * via the given method. Therefore implement this Interface and add
+ * the class as a Listener to the Wiimote.
  *
  * @author Benjamin 'BePo' Poppinga
  */

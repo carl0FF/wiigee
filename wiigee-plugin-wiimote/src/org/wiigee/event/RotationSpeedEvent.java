@@ -27,6 +27,12 @@ package org.wiigee.event;
 import java.util.EventObject;
 import org.wiigee.device.Device;
 
+/**
+ * The RotationSpeedEvent contains the raw angle velocities - psi, theta, phi.
+ * This event only occurs, if a Wii Motion Plus is attached.
+ *
+ * @author Benjamin 'BePo' Poppinga
+ */
 public class RotationSpeedEvent extends EventObject {
 
 	protected double psi;

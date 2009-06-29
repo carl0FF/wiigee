@@ -27,13 +27,17 @@ package org.wiigee.control;
 import org.wiigee.util.Log;
 
 /**
+ * The mother of all classes. :-) It's just used as parent class
+ * to print version information and later on maybe dynamic configuring
+ * of the whole wiimote system... detecting plugins and devices automatically
+ * maybe. :)
  *
- * @author bepo
+ * @author Benjamin 'BePo' Poppinga
  */
 public class Wiigee {
 
-    protected static String version = "1.5.2 alpha";
-    protected static String releasedate = "20090625";
+    protected static String version = "1.5.3 alpha";
+    protected static String releasedate = "20090626";
 
     protected Wiigee() {
         Log.write("This is wiigee version "+version+" ("+releasedate+")");

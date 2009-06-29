@@ -31,6 +31,14 @@ import org.wiigee.logic.*;
 import org.wiigee.event.*;
 import org.wiigee.filter.*;
 
+/**
+ * Abstract representation of a device with very basic functionalities. This
+ * class should be derived from, if anybody plans to add a new class of devices,
+ * like Wiimote or AndroidDevice does. This class mainly consist of filter
+ * management, recognition control and core event control.
+ *
+ * @author Benjamin 'BePo' Poppinga
+ */
 public class Device {
 	
 	// Fixed number values.

@@ -28,7 +28,6 @@ import java.util.EventObject;
 import org.wiigee.logic.ProcessingUnit;
 
 /**
- * 
  * This is a StateEvent, telling the listeners in which state of recognition
  * the tool is:
  * 	1 = training,

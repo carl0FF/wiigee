@@ -31,14 +31,13 @@ import javax.bluetooth.L2CAPConnection;
 import javax.microedition.io.Connector;
 import org.wiigee.event.*;
 import org.wiigee.filter.Filter;
-import org.wiigee.filter.RotationThresholdFilter;
 import org.wiigee.util.Log;
 
 /**
- * @author Benjamin 'BePo' Poppinga
  * This class represents the basic functions of the wiimote.
  * If you want your wiimote to e.g. vibrate you'll do this here.
  *
+ * @author Benjamin 'BePo' Poppinga
  */
 public class Wiimote extends Device {
 
@@ -214,6 +213,12 @@ public class Wiimote extends Device {
         this.rotfilters.add(filter);
     }
 
+    /**
+     * Resets all filters which are applied to the rotation data
+     * from the Wii Motion Plus. Also resets _all_ determined orientation
+     * angles,  which should be extended with a consideration of other
+     * external datas - maybe irda events.
+     */
     public void resetRotationFilters() {
         this.yaw = 0.0;
         this.pitch = 0.0;
@@ -302,7 +307,7 @@ public class Wiimote extends Device {
 		if(this.controlCon!=null) {
 			this.controlCon.send(raw);
 			try {
-				Thread.sleep(30l);
+				Thread.sleep(100l);
 			} catch (InterruptedException e) {
 				System.out.println("sendRaw() interrupted");
 			}
@@ -417,10 +422,10 @@ public class Wiimote extends Device {
         Log.write("Enabling WII MOTION PLUS..");
 
         // write 0x55 to 0x04a600f0
-        this.writeRegister(new byte[] {(byte)0xa6, 0x00, (byte)0xf0}, new byte[] {0x55});
+        //this.writeRegister(new byte[] {(byte)0xa6, 0x00, (byte)0xf0}, new byte[] {0x55});
         
         // write 0x00 to 0x04a600fb
-        this.writeRegister(new byte[] {(byte)0xa6, 0x00, (byte)0xfb}, new byte[] {0x00});
+        //this.writeRegister(new byte[] {(byte)0xa6, 0x00, (byte)0xfb}, new byte[] {0x00});
 
         // write 0x04 to 0x04a600fe to get wii m+ data within extension reports
         this.writeRegister(new byte[] {(byte)0xa6, 0x00, (byte)0xfe}, new byte[] {0x04});
@@ -511,9 +516,9 @@ public class Wiimote extends Device {
             }
 
             // update orientation with integration
-            this.pitch = this.pitch + vector[0] * 0.01;
+            this.yaw = this.yaw + vector[0] * 0.01;
             this.roll = this.roll + vector[1] * 0.01;
-            this.yaw = this.yaw + vector[2] * 0.01;
+            this.pitch = this.pitch + vector[2] * 0.01;
             this.fireRotationEvent(this.pitch, this.roll, this.yaw);
         }
     }

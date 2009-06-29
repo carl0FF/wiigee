@@ -24,6 +24,11 @@
 
 package org.wiigee.filter;
 
+/**
+ * Abstract class to give a definition for a general filter.
+ *
+ * @author Benjamin 'BePo' Poppinga
+ */
 public abstract class Filter {
 	
 	/***

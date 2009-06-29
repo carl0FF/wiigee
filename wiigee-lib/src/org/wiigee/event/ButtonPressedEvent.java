@@ -51,6 +51,8 @@ import org.wiigee.device.*;
  * Button 15 unknown
  * Button 16 unknown
  *
+ * There can be other interpretations of buttons for other devices.
+ *
  * @author Benjamin 'BePo' Poppinga
  */
 public class ButtonPressedEvent extends ActionStartEvent {

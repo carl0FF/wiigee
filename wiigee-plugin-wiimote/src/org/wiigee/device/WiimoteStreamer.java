@@ -239,7 +239,7 @@ public class WiimoteStreamer extends Thread {
         double phi = (double)(phiRAW - phi0) / 20.0;
 
         this.wiimote.fireRotationSpeedEvent(new
-                double[] { psi, theta, phi });
+                double[] { -psi, -theta, -phi });
 
     }
 

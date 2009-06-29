@@ -27,7 +27,6 @@ package org.wiigee.event;
 import java.util.EventListener;
 
 /**
- * 
  * This is the StateListener interface which has to be implemented
  * by any application which should receive recognized statechanges.
  * 

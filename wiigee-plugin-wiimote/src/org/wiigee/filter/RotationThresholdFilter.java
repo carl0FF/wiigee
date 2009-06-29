@@ -26,7 +26,7 @@ package org.wiigee.filter;
 
 /**
  * Removes rotation events which are for all axis
- * under a defined threshold value (which default is 0.5 degrees
+ * under a defined threshold value (which default is 2.0 degrees
  * per second TBD).
  *
  * @author Benjamin 'BePo' Poppinga
@@ -37,7 +37,7 @@ public class RotationThresholdFilter extends Filter {
 
 	public RotationThresholdFilter() {
 		super();
-		this.threshold = 0.5;
+		this.threshold = 2.0;
 	}
 
     public RotationThresholdFilter(double threshold) {

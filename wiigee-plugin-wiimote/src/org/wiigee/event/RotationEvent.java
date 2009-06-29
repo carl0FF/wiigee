@@ -27,6 +27,16 @@ package org.wiigee.event;
 import java.util.EventObject;
 import org.wiigee.device.Device;
 
+/**
+ * A RotationEvents contains the current relative rotation to the last
+ * given reset position. If the device has never been resetted before,
+ * the last position is the Wiimotes initial position. This event contains
+ * all three angles - pitch, yaw, roll - which are only determined using
+ * the Wii Motion Plus extension. There wouldn't be a RotationEvent without
+ * this extension.
+ *
+ * @author Benjamin 'BePo' Poppinga
+ */
 public class RotationEvent extends EventObject {
 
     protected double pitch;

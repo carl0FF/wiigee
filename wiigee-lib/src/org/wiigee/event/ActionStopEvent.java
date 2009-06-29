@@ -27,6 +27,13 @@ package org.wiigee.event;
 import java.util.EventObject;
 import org.wiigee.device.Device;
 
+/**
+ * An ActionStopEvent is an Event where other different events can
+ * be derived from, if they can be considered as an event actually stopping
+ * a process like e.g. Training, Recognition, ...
+ *
+ * @author Benjamin 'BePo' Poppinga
+ */
 public class ActionStopEvent extends EventObject {
 	
 	public ActionStopEvent(Device source) {

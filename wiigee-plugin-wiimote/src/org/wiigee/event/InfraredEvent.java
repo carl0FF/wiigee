@@ -27,6 +27,13 @@ package org.wiigee.event;
 import java.util.EventObject;
 import org.wiigee.device.Device;
 
+/**
+ * An infrared event consists of a set of coordinates, containing values
+ * from [0, 1024] in width to [0, 768] in height. for each point there is
+ * a given size and if the detected infrared spot is valid.
+ *
+ * @author Benjamin 'BePo' Poppinga
+ */
 public class InfraredEvent extends EventObject {
 
 	protected int[][] coordinates;

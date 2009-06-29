@@ -24,16 +24,19 @@
 
 package org.wiigee.device;
 
-import org.wiigee.device.*;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
 /**
- * Android based device implementation
+ * Device representation for Android Mobile Phones, like HTC Magic. Since
+ * the API for Sensor values changed within the last Android SDKs this
+ * should only compile for Android SDKs >= 1.5.
  *
- * @author liangj01
+ * @author Maarten 'MrSnowflake' Krijn
+ * @author zl25drexel
+ * @author Benjamin 'BePo' Poppinga
  *
  */
 public class AndroidDevice extends Device implements SensorEventListener {

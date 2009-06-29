@@ -29,7 +29,7 @@ import org.wiigee.device.Device;
 /**
 * 
 * This event would be generated if a motion stops.
-* contains: source (wiimote).
+* contains: source.
 *
 * @author Benjamin 'BePo' Poppinga
 */
@@ -37,7 +37,6 @@ public class MotionStopEvent extends ActionStopEvent {
 
 	public MotionStopEvent(Device source) {
 		super(source);
-		// TODO Auto-generated constructor stub
 	}
 	
 }

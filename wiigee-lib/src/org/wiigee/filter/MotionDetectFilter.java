@@ -26,6 +26,12 @@ package org.wiigee.filter;
 
 import org.wiigee.device.Device;
 
+/**
+ * This filter uses time to determine if the wiimote actually is in motion
+ * or not. This filter only works together with the IdleStateFilter.
+ *
+ * @author Benjamin 'BePo' Poppinga
+ */
 public class MotionDetectFilter extends Filter {
 
 	private int motionchangetime;

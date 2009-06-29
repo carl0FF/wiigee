@@ -28,6 +28,13 @@ import java.util.EventObject;
 
 import org.wiigee.device.Device;
 
+/**
+ * An ActionStartEvent is an Event where other different events can
+ * be derived from, if they can be considered as an event actually starting
+ * a process like e.g. Training, Recognition, ...
+ *
+ * @author Benjamin 'BePo' Poppinga
+ */
 public class ActionStartEvent extends EventObject {
 
 	protected boolean trainbutton;

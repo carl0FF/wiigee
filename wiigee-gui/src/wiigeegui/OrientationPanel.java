@@ -56,13 +56,13 @@ public class OrientationPanel extends JPanel {
 
     public void setRotation(RotationEvent e) {
         Transform3D rotationX = new Transform3D();
-        rotationX.rotX(Math.toRadians(-e.getYaw()));
+        rotationX.rotX(Math.toRadians(e.getPitch()));
 
         Transform3D rotationY = new Transform3D();
-        rotationY.rotY(Math.toRadians(e.getPitch()));
+        rotationY.rotY(Math.toRadians(-e.getYaw()));
 
         Transform3D rotationZ = new Transform3D();
-        rotationZ.rotZ(Math.toRadians(e.getRoll()));
+        rotationZ.rotZ(Math.toRadians(-e.getRoll()));
 
         rotationX.mul(rotationY);
         rotationX.mul(rotationZ);

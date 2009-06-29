@@ -24,6 +24,12 @@
 
 package org.wiigee.filter;
 
+/**
+ * This filter removes a vector, if it doesn't differ enough from
+ * the previously retrieved filter.
+ *
+ * @author Benjamin 'BePo' Poppinga
+ */
 public class DirectionalEquivalenceFilter extends Filter {
 	
 	private double sensivity;

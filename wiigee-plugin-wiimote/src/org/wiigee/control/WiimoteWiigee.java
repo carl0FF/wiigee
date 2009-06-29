@@ -38,8 +38,8 @@ import org.wiigee.filter.Filter;
 // Singleton
 public class WiimoteWiigee extends Wiigee {
 
-    protected static String pluginversion = "1.5.2 alpha";
-    protected static String pluginreleasedate = "20090625";
+    protected static String pluginversion = "1.5.3 alpha";
+    protected static String pluginreleasedate = "20090626";
     private static final Object lock = new Object();
     private Vector<Wiimote> devices;
 
@@ -75,13 +75,26 @@ public class WiimoteWiigee extends Wiigee {
         }
     }
 
+    /**
+     * Automatically discovers Wiimotes nearby and connects to
+     * the first responding Wiimote visible. For multiple managed
+     * instances of the Wiimote, please use getDevices().
+     *
+     * @return First visible Wiimote. Null otherwise.
+     * @throws java.io.IOException
+     */
     public Wiimote getDevice() throws IOException {
         this.devices = this.discoverWiimotes();
-        return devices.elementAt(0);
+        if(this.devices.size()>0) {
+            return devices.elementAt(0);
+        }
+        return null;
     }
 
     /**
-     * Returns an array of discovered wiimotes.
+     * Returns an array of all discovered Wiimotes. The count
+     * of Devices depends on your computers bluetooth capabilities.
+     * Usually up to 7 Wiimotes/Devices can be connected.
      *
      * @return Array of discovered wiimotes or null if
      * none discoverd.
@@ -95,7 +108,12 @@ public class WiimoteWiigee extends Wiigee {
         for (int i = 0; i < this.devices.size(); i++) {
             out[i] = this.devices.elementAt(i);
         }
-        return out;
+
+        if(out.length>0) {
+            return out;
+        }
+
+        return null;
     }
 
     /**
@@ -133,7 +151,10 @@ public class WiimoteWiigee extends Wiigee {
      * @return Number of wiimotes discovered.
      */
     public int getNumberOfDevices() {
-        return this.devices.size();
+        if(this.devices!=null) {
+            return this.devices.size();
+        }
+        return 0;
     }
 
     /**

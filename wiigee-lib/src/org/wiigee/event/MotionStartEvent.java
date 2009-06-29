@@ -26,6 +26,11 @@ package org.wiigee.event;
 
 import org.wiigee.device.Device;
 
+/**
+ * This Event gets fired, if the Device starts to move.
+ *
+ * @author Benjamin 'BePo' Poppinga
+ */
 public class MotionStartEvent extends ActionStartEvent {
 	
 	public MotionStartEvent(Device source) {

@@ -24,6 +24,12 @@
 
 package org.wiigee.filter;
 
+/**
+ * Filters if the wiimote is not moved in any way. Be careful in using
+ * this filter together with a HighPassFilter.
+ *
+ * @author Benjamin 'BePo' Poppinga
+ */
 public class IdleStateFilter extends Filter {
 	
 	private double sensivity;
