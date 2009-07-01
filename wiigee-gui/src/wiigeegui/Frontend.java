@@ -38,6 +38,7 @@ import org.wiigee.event.ButtonListener;
 import org.wiigee.event.RotationListener;
 import org.wiigee.event.StateListener;
 import org.wiigee.filter.HighPassFilter;
+import org.wiigee.filter.RotationResetFilter;
 import org.wiigee.filter.RotationThresholdFilter;
 import org.wiigee.util.Log;
 
@@ -135,24 +136,30 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
 
         jFileChooser1 = new javax.swing.JFileChooser();
         selectWiimoteDialog = new javax.swing.JDialog();
+        jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        connectWiimoteButton = new javax.swing.JButton();
         wiimotesMacTextField = new javax.swing.JTextField();
+        connectWiimoteButton = new javax.swing.JButton();
         scanWiimoteDialog = new javax.swing.JDialog();
         scanWiimoteStatusLabel = new javax.swing.JLabel();
         scanWiimoteApproveButton = new javax.swing.JButton();
         getGestureMeaningDialog = new javax.swing.JDialog();
+        jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         gestureMeaningTextField = new javax.swing.JTextField();
         setGestureMeaningButton = new javax.swing.JButton();
-        consoleScrollPane = new javax.swing.JScrollPane();
-        consoleTextArea = new javax.swing.JTextArea();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        gesturePanel = new javax.swing.JPanel();
+        wiimotePanel1 = new wiigeegui.WiimotePanel();
         graphPanel1 = new wiigeegui.GraphPanel();
         inMotionField = new javax.swing.JTextField();
         recognitionField = new javax.swing.JTextField();
         trainingField = new javax.swing.JTextField();
         gestureField = new javax.swing.JTextField();
-        wiimotePanel1 = new wiigeegui.WiimotePanel();
+        consoleScrollPane = new javax.swing.JScrollPane();
+        consoleTextArea = new javax.swing.JTextArea();
+        accelerationLabel = new javax.swing.JLabel();
+        rotationPanel = new javax.swing.JPanel();
         orientationPanel1 = new wiigeegui.OrientationPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
         wiimoteMenu = new javax.swing.JMenu();
@@ -176,9 +183,14 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
 
         selectWiimoteDialog.setTitle("Connect");
         selectWiimoteDialog.setModal(true);
-        selectWiimoteDialog.setName("selectWiimote"); // NOI18N
+        selectWiimoteDialog.setName("selectWiimoteDialog"); // NOI18N
+        selectWiimoteDialog.setResizable(false);
+
+        jPanel1.setMinimumSize(new java.awt.Dimension(315, 125));
 
         jLabel1.setText("Please enter the Wiimote's Bluetooth MAC:");
+
+        wiimotesMacTextField.setText("00:1E:35:0F:40:BA");
 
         connectWiimoteButton.setText("Connect");
         connectWiimoteButton.addActionListener(new java.awt.event.ActionListener() {
@@ -187,32 +199,42 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
             }
         });
 
-        wiimotesMacTextField.setText("00:1E:35:0F:40:BA");
-
-        org.jdesktop.layout.GroupLayout selectWiimoteDialogLayout = new org.jdesktop.layout.GroupLayout(selectWiimoteDialog.getContentPane());
-        selectWiimoteDialog.getContentPane().setLayout(selectWiimoteDialogLayout);
-        selectWiimoteDialogLayout.setHorizontalGroup(
-            selectWiimoteDialogLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(selectWiimoteDialogLayout.createSequentialGroup()
+        org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .add(selectWiimoteDialogLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(connectWiimoteButton)
-                    .add(selectWiimoteDialogLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                        .add(org.jdesktop.layout.GroupLayout.LEADING, wiimotesMacTextField)
-                        .add(org.jdesktop.layout.GroupLayout.LEADING, jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, jLabel1)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, wiimotesMacTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE))
+                .addContainerGap())
         );
-        selectWiimoteDialogLayout.setVerticalGroup(
-            selectWiimoteDialogLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(selectWiimoteDialogLayout.createSequentialGroup()
-                .add(32, 32, 32)
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(wiimotesMacTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(connectWiimoteButton)
-                .addContainerGap())
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        org.jdesktop.layout.GroupLayout selectWiimoteDialogLayout = new org.jdesktop.layout.GroupLayout(selectWiimoteDialog.getContentPane());
+        selectWiimoteDialog.getContentPane().setLayout(selectWiimoteDialogLayout);
+        selectWiimoteDialogLayout.setHorizontalGroup(
+            selectWiimoteDialogLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 305, Short.MAX_VALUE)
+        );
+        selectWiimoteDialogLayout.setVerticalGroup(
+            selectWiimoteDialogLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        selectWiimoteDialog.getAccessibleContext().setAccessibleParent(this);
 
         scanWiimoteDialog.setTitle("Scanning...");
         scanWiimoteDialog.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -256,6 +278,7 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
         );
 
         getGestureMeaningDialog.setModal(true);
+        getGestureMeaningDialog.setResizable(false);
 
         jLabel2.setText("Please enter the meaning of the trained gesture:");
 
@@ -268,31 +291,39 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
             }
         });
 
-        org.jdesktop.layout.GroupLayout getGestureMeaningDialogLayout = new org.jdesktop.layout.GroupLayout(getGestureMeaningDialog.getContentPane());
-        getGestureMeaningDialog.getContentPane().setLayout(getGestureMeaningDialogLayout);
-        getGestureMeaningDialogLayout.setHorizontalGroup(
-            getGestureMeaningDialogLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(getGestureMeaningDialogLayout.createSequentialGroup()
+        org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .add(getGestureMeaningDialogLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, gestureMeaningTextField)
+                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(setGestureMeaningButton)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, gestureMeaningTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE)
                     .add(org.jdesktop.layout.GroupLayout.LEADING, jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, getGestureMeaningDialogLayout.createSequentialGroup()
-                .addContainerGap(249, Short.MAX_VALUE)
-                .add(setGestureMeaningButton)
                 .addContainerGap())
         );
-        getGestureMeaningDialogLayout.setVerticalGroup(
-            getGestureMeaningDialogLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(getGestureMeaningDialogLayout.createSequentialGroup()
-                .addContainerGap(20, Short.MAX_VALUE)
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
                 .add(jLabel2)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(gestureMeaningTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(setGestureMeaningButton)
-                .add(9, 9, 9))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        org.jdesktop.layout.GroupLayout getGestureMeaningDialogLayout = new org.jdesktop.layout.GroupLayout(getGestureMeaningDialog.getContentPane());
+        getGestureMeaningDialog.getContentPane().setLayout(getGestureMeaningDialogLayout);
+        getGestureMeaningDialogLayout.setHorizontalGroup(
+            getGestureMeaningDialogLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+        );
+        getGestureMeaningDialogLayout.setVerticalGroup(
+            getGestureMeaningDialogLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -304,12 +335,18 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
             }
         });
 
-        consoleScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        wiimotePanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
-        consoleTextArea.setColumns(20);
-        consoleTextArea.setLineWrap(true);
-        consoleTextArea.setRows(5);
-        consoleScrollPane.setViewportView(consoleTextArea);
+        org.jdesktop.layout.GroupLayout wiimotePanel1Layout = new org.jdesktop.layout.GroupLayout(wiimotePanel1);
+        wiimotePanel1.setLayout(wiimotePanel1Layout);
+        wiimotePanel1Layout.setHorizontalGroup(
+            wiimotePanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 158, Short.MAX_VALUE)
+        );
+        wiimotePanel1Layout.setVerticalGroup(
+            wiimotePanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 664, Short.MAX_VALUE)
+        );
 
         graphPanel1.setBackground(new java.awt.Color(255, 255, 255));
         graphPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -318,7 +355,7 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
         graphPanel1.setLayout(graphPanel1Layout);
         graphPanel1Layout.setHorizontalGroup(
             graphPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 421, Short.MAX_VALUE)
+            .add(0, 433, Short.MAX_VALUE)
         );
         graphPanel1Layout.setVerticalGroup(
             graphPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -338,21 +375,86 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
         trainingField.setText("Training");
 
         gestureField.setEditable(false);
-        gestureField.setFont(new java.awt.Font("Lucida Grande", 1, 15));
+        gestureField.setFont(new java.awt.Font("Lucida Grande", 1, 15)); // NOI18N
         gestureField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
-        wiimotePanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        consoleScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
-        org.jdesktop.layout.GroupLayout wiimotePanel1Layout = new org.jdesktop.layout.GroupLayout(wiimotePanel1);
-        wiimotePanel1.setLayout(wiimotePanel1Layout);
-        wiimotePanel1Layout.setHorizontalGroup(
-            wiimotePanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 158, Short.MAX_VALUE)
+        consoleTextArea.setColumns(20);
+        consoleTextArea.setLineWrap(true);
+        consoleTextArea.setRows(5);
+        consoleScrollPane.setViewportView(consoleTextArea);
+
+        accelerationLabel.setText("Acceleration:");
+
+        org.jdesktop.layout.GroupLayout gesturePanelLayout = new org.jdesktop.layout.GroupLayout(gesturePanel);
+        gesturePanel.setLayout(gesturePanelLayout);
+        gesturePanelLayout.setHorizontalGroup(
+            gesturePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(gesturePanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .add(wiimotePanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(gesturePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, gesturePanelLayout.createSequentialGroup()
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(gestureField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 439, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .add(gesturePanelLayout.createSequentialGroup()
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(inMotionField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 146, Short.MAX_VALUE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(recognitionField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(trainingField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .add(gesturePanelLayout.createSequentialGroup()
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                        .add(gesturePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(accelerationLabel)
+                            .add(graphPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addContainerGap())
+                    .add(gesturePanelLayout.createSequentialGroup()
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                        .add(consoleScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 435, Short.MAX_VALUE)
+                        .addContainerGap())))
         );
-        wiimotePanel1Layout.setVerticalGroup(
-            wiimotePanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 649, Short.MAX_VALUE)
+        gesturePanelLayout.setVerticalGroup(
+            gesturePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(gesturePanelLayout.createSequentialGroup()
+                .add(gesturePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, gesturePanelLayout.createSequentialGroup()
+                        .add(accelerationLabel)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .add(graphPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(gesturePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE, false)
+                            .add(inMotionField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(recognitionField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(trainingField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(gestureField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 40, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(consoleScrollPane, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 335, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(wiimotePanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
+
+        jTabbedPane1.addTab("Gestures", gesturePanel);
+
+        org.jdesktop.layout.GroupLayout rotationPanelLayout = new org.jdesktop.layout.GroupLayout(rotationPanel);
+        rotationPanel.setLayout(rotationPanelLayout);
+        rotationPanelLayout.setHorizontalGroup(
+            rotationPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(orientationPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 649, Short.MAX_VALUE)
+        );
+        rotationPanelLayout.setVerticalGroup(
+            rotationPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(rotationPanelLayout.createSequentialGroup()
+                .add(orientationPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 608, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(78, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("Rotation", rotationPanel);
 
         wiimoteMenu.setText("Wiimote");
 
@@ -408,43 +510,13 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
-                .add(wiimotePanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(orientationPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 423, Short.MAX_VALUE)
-                    .add(consoleScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 423, Short.MAX_VALUE)
-                    .add(gestureField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 423, Short.MAX_VALUE)
-                    .add(graphPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                        .add(inMotionField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(recognitionField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 145, Short.MAX_VALUE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(trainingField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE)))
-                .addContainerGap())
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 670, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .add(20, 20, 20)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                    .add(wiimotePanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(layout.createSequentialGroup()
-                        .add(graphPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE, false)
-                            .add(inMotionField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(recognitionField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(trainingField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(gestureField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 40, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(orientationPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(consoleScrollPane, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 99, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .add(jTabbedPane1)
+                .addContainerGap())
         );
 
         pack();
@@ -565,8 +637,9 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
         try {
             this.wiimote.disableAccelerationSensors();
             this.wiimote.enableWiiMotionPlus();
+            //this.wiimote.addAccelerationFilter(new RotationResetFilter(this.wiimote));
             this.wiimote.addAccelerationFilter(new HighPassFilter());
-            this.wiimote.addRotationFilter(new RotationThresholdFilter(2.0));
+            this.wiimote.addRotationFilter(new RotationThresholdFilter(0.5));
             } catch(Exception e) {
                 Log.write("Grosser Mist: setupWiimote()");
                 e.printStackTrace();
@@ -580,6 +653,7 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel accelerationLabel;
     private javax.swing.JMenuItem autoconnectWiimoteItem;
     private javax.swing.JButton connectWiimoteButton;
     private javax.swing.JMenuItem connectWiimoteItem;
@@ -589,6 +663,7 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
     private javax.swing.JMenu fileMenu;
     private javax.swing.JTextField gestureField;
     private javax.swing.JTextField gestureMeaningTextField;
+    private javax.swing.JPanel gesturePanel;
     private javax.swing.JDialog getGestureMeaningDialog;
     private wiigeegui.GraphPanel graphPanel1;
     private javax.swing.JTextField inMotionField;
@@ -596,9 +671,13 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JMenuItem loadGesturesItem;
     private wiigeegui.OrientationPanel orientationPanel1;
     private javax.swing.JTextField recognitionField;
+    private javax.swing.JPanel rotationPanel;
     private javax.swing.JMenuItem saveGesturesItem;
     private javax.swing.JButton scanWiimoteApproveButton;
     private javax.swing.JDialog scanWiimoteDialog;

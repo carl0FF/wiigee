@@ -21,7 +21,6 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
 package org.wiigee.device;
 
 import java.io.IOException;
@@ -40,64 +39,66 @@ import org.wiigee.filter.*;
  * @author Benjamin 'BePo' Poppinga
  */
 public class Device {
-	
-	// Fixed number values.
-	public static final int MOTION = 0;
 
-	// Buttons for action coordination
-	protected int recognitionbutton;
-	protected int trainbutton;
-	protected int closegesturebutton;
-	
-	// Functional
-	protected boolean accelerationenabled;
-	
-	// Filters, can filter the data stream
-	protected Vector<Filter> accfilters = new Vector<Filter>();
-	
-	// Listeners, receive generated events
-	protected Vector<AccelerationListener> accelerationlistener = new Vector<AccelerationListener>();
+    // Fixed number values.
+    public static final int MOTION = 0;
+
+    // Buttons for action coordination
+    protected int recognitionbutton;
+    protected int trainbutton;
+    protected int closegesturebutton;
+
+    // Functional
+    protected boolean accelerationenabled;
+
+    // Filters, can filter the data stream
+    protected Vector<Filter> accfilters = new Vector<Filter>();
+
+    // Listeners, receive generated events
+    protected Vector<AccelerationListener> accelerationlistener = new Vector<AccelerationListener>();
     protected Vector<ButtonListener> buttonlistener = new Vector<ButtonListener>();
-	protected ProcessingUnit processingunit = new TriggeredProcessingUnit();
-	
-	public Device(boolean autofiltering) {
-        if(autofiltering) {
+
+    // Processing unit to analyze the data
+    protected ProcessingUnit processingunit = new TriggeredProcessingUnit();
+
+    public Device(boolean autofiltering) {
+        if (autofiltering) {
             this.addAccelerationFilter(new IdleStateFilter());
             this.addAccelerationFilter(new MotionDetectFilter(this));
             this.addAccelerationFilter(new DirectionalEquivalenceFilter());
         }
-		this.addAccelerationListener(this.processingunit);
+        this.addAccelerationListener(this.processingunit);
         this.addButtonListener(this.processingunit);
-	}
-	
-	/**
-	 * Adds a Filter for processing the acceleration values.
-	 * @param filter The Filter instance.
-	 */
-	public void addAccelerationFilter(Filter filter) {
-		this.accfilters.add(filter);
-	}
-	
-	/**
-	 * Resets all the accfilters, which are resetable.
-	 * Sometimes they have to be resettet if a new gesture starts.
-	 */
-	public void resetAccelerationFilters() {
-		for(int i=0; i<this.accfilters.size(); i++) {
-			this.accfilters.elementAt(i).reset();
-		}
-	}
-	
-	/**
-	 * Adds an AccelerationListener to the Device. Everytime an acceleration
-	 * on the Device is performed the AccelerationListener would receive
-	 * an event of this action.
-	 *
+    }
+
+    /**
+     * Adds a Filter for processing the acceleration values.
+     * @param filter The Filter instance.
+     */
+    public void addAccelerationFilter(Filter filter) {
+        this.accfilters.add(filter);
+    }
+
+    /**
+     * Resets all the accfilters, which are resetable.
+     * Sometimes they have to be resettet if a new gesture starts.
+     */
+    public void resetAccelerationFilters() {
+        for (int i = 0; i < this.accfilters.size(); i++) {
+            this.accfilters.elementAt(i).reset();
+        }
+    }
+
+    /**
+     * Adds an AccelerationListener to the Device. Everytime an acceleration
+     * on the Device is performed the AccelerationListener would receive
+     * an event of this action.
+     *
      * @param listener The Listener.
-	 */
-	public void addAccelerationListener(AccelerationListener listener) {
-		this.accelerationlistener.add(listener);
-	}
+     */
+    public void addAccelerationListener(AccelerationListener listener) {
+        this.accelerationlistener.add(listener);
+    }
 
     /**
      * Adds a ButtonListener to the Device. Everytime a Button has been
@@ -110,56 +111,56 @@ public class Device {
         this.buttonlistener.add(listener);
     }
 
-	/**
-	 * Adds a GestureListener to the Device. Everytime a gesture
-	 * is performed the GestureListener would receive an event of
-	 * this gesture.
+    /**
+     * Adds a GestureListener to the Device. Everytime a gesture
+     * is performed the GestureListener would receive an event of
+     * this gesture.
      *
      * @param listener The Listener.
-	 */
-	public void addGestureListener(GestureListener listener) {
-		this.processingunit.addGestureListener(listener);
-	}
-	
-	public int getRecognitionButton() {
-		return this.recognitionbutton;
-	}
-	
-	public void setRecognitionButton(int b) {
-		this.recognitionbutton=b;
-	}
-	
-	public int getTrainButton() {
-		return this.trainbutton;
-	}
-	
-	public void setTrainButton(int b) {
-		this.trainbutton=b;
-	}
-	
-	public int getCloseGestureButton() {
-		return this.closegesturebutton;
-	}
-	
-	public void setCloseGestureButton(int b) {
-		this.closegesturebutton=b;
-	}
+     */
+    public void addGestureListener(GestureListener listener) {
+        this.processingunit.addGestureListener(listener);
+    }
 
-	public ProcessingUnit getProcessingUnit() {
-		return this.processingunit;
-	}
-	
-	public boolean accelerationEnabled() {
-		return this.accelerationenabled;
-	}
-	
-	public void enableAccelerationSensors() throws IOException {
-		this.accelerationenabled=true;
-	}
-	
-	public void disableAccelerationSensors() throws IOException {
-		this.accelerationenabled=false;
-	}
+    public int getRecognitionButton() {
+        return this.recognitionbutton;
+    }
+
+    public void setRecognitionButton(int b) {
+        this.recognitionbutton = b;
+    }
+
+    public int getTrainButton() {
+        return this.trainbutton;
+    }
+
+    public void setTrainButton(int b) {
+        this.trainbutton = b;
+    }
+
+    public int getCloseGestureButton() {
+        return this.closegesturebutton;
+    }
+
+    public void setCloseGestureButton(int b) {
+        this.closegesturebutton = b;
+    }
+
+    public ProcessingUnit getProcessingUnit() {
+        return this.processingunit;
+    }
+
+    public boolean accelerationEnabled() {
+        return this.accelerationenabled;
+    }
+
+    public void enableAccelerationSensors() throws IOException {
+        this.accelerationenabled = true;
+    }
+
+    public void disableAccelerationSensors() throws IOException {
+        this.accelerationenabled = false;
+    }
 
     public void loadGesture(String filename) {
         this.processingunit.loadGesture(filename);
@@ -168,76 +169,74 @@ public class Device {
     public void saveGesture(int id, String filename) {
         this.processingunit.saveGesture(id, filename);
     }
-	
-	// ###### Event-Methoden
-	
-	/** Fires an acceleration event.
-	 * @param vector Consists of three values:
-     * acceleration on X, Y and Z axis.
-	 */
-	public void fireAccelerationEvent(double[] vector) {
-		for(int i=0; i<this.accfilters.size(); i++) {
-			vector = this.accfilters.get(i).filter(vector);
-			// cannot return here if null, because of time-dependent accfilters
-		}
-		
-		// don't need to create an event if filtered away
-		if(vector!=null) {
-				// 	calculate the absolute value for the accelerationevent
-			double absvalue = Math.sqrt((vector[0]*vector[0])+
-					(vector[1]*vector[1])+(vector[2]*vector[2]));
-		
-			AccelerationEvent w = new AccelerationEvent(this,
-					vector[0], vector[1], vector[2], absvalue);
-			for(int i=0; i<this.accelerationlistener.size(); i++) {
-				this.accelerationlistener.get(i).accelerationReceived(w);
-			}
-		}
 
-	} // fireaccelerationevent
-	
-	/** Fires a button pressed event.
-	 * @param button
-	 * 		Integer value of the pressed button.
-	 */
-	public void fireButtonPressedEvent(int button) {
-		ButtonPressedEvent w = new ButtonPressedEvent(this, button);
-		for(int i=0; i<this.buttonlistener.size(); i++) {
-			this.buttonlistener.get(i).buttonPressReceived(w);
-		}
-		
-		if(w.isRecognitionInitEvent() || w.isTrainInitEvent()) {
-			this.resetAccelerationFilters();
-		}
-	}
-	
-	/** Fires a button released event.
-	 */
-	public void fireButtonReleasedEvent() {
-		ButtonReleasedEvent w = new ButtonReleasedEvent(this);
-		for(int i=0; i<this.buttonlistener.size(); i++) {
-			this.buttonlistener.get(i).buttonReleaseReceived(w);
-		}
-	}
-	
-	/**
-	 * Fires a motion start event.
-	 */
-	public void fireMotionStartEvent() {
-		MotionStartEvent w = new MotionStartEvent(this);
-		for(int i=0; i<this.accelerationlistener.size(); i++) {
-			this.accelerationlistener.get(i).motionStartReceived(w);
-		}
-	}
-	
-	/**
-	 * Fires a motion stop event.
-	 */
-	public void fireMotionStopEvent() {
-		MotionStopEvent w = new MotionStopEvent(this);
-		for(int i=0; i<this.accelerationlistener.size(); i++) {
-			this.accelerationlistener.get(i).motionStopReceived(w);
-		}
-	}	
-	
+    // ###### Event-Methoden
+    /** Fires an acceleration event.
+     * @param vector Consists of three values:
+     * acceleration on X, Y and Z axis.
+     */
+    public void fireAccelerationEvent(double[] vector) {
+        for (int i = 0; i < this.accfilters.size(); i++) {
+            vector = this.accfilters.get(i).filter(vector);
+            // cannot return here if null, because of time-dependent accfilters
+        }
+
+        // don't need to create an event if filtered away
+        if (vector != null) {
+            // 	calculate the absolute value for the accelerationevent
+            double absvalue = Math.sqrt((vector[0] * vector[0]) +
+                    (vector[1] * vector[1]) + (vector[2] * vector[2]));
+
+            AccelerationEvent w = new AccelerationEvent(this,
+                    vector[0], vector[1], vector[2], absvalue);
+            for (int i = 0; i < this.accelerationlistener.size(); i++) {
+                this.accelerationlistener.get(i).accelerationReceived(w);
+            }
+        }
+
+    } // fireaccelerationevent
+
+    /** Fires a button pressed event.
+     * @param button
+     * 		Integer value of the pressed button.
+     */
+    public void fireButtonPressedEvent(int button) {
+        ButtonPressedEvent w = new ButtonPressedEvent(this, button);
+        for (int i = 0; i < this.buttonlistener.size(); i++) {
+            this.buttonlistener.get(i).buttonPressReceived(w);
+        }
+
+        if (w.isRecognitionInitEvent() || w.isTrainInitEvent()) {
+            this.resetAccelerationFilters();
+        }
+    }
+
+    /** Fires a button released event.
+     */
+    public void fireButtonReleasedEvent() {
+        ButtonReleasedEvent w = new ButtonReleasedEvent(this);
+        for (int i = 0; i < this.buttonlistener.size(); i++) {
+            this.buttonlistener.get(i).buttonReleaseReceived(w);
+        }
+    }
+
+    /**
+     * Fires a motion start event.
+     */
+    public void fireMotionStartEvent() {
+        MotionStartEvent w = new MotionStartEvent(this);
+        for (int i = 0; i < this.accelerationlistener.size(); i++) {
+            this.accelerationlistener.get(i).motionStartReceived(w);
+        }
+    }
+
+    /**
+     * Fires a motion stop event.
+     */
+    public void fireMotionStopEvent() {
+        MotionStopEvent w = new MotionStopEvent(this);
+        for (int i = 0; i < this.accelerationlistener.size(); i++) {
+            this.accelerationlistener.get(i).motionStopReceived(w);
+        }
+    }
 }

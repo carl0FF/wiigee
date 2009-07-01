@@ -36,7 +36,7 @@ public class ClassifierTest extends TestCase {
     public void testClassifyGesture() {
 
         // create a pseudo-device
-        Device d = new Device();
+        Device d = new Device(true);
 
         // create 3 gestures
         Gesture g0 = new Gesture();

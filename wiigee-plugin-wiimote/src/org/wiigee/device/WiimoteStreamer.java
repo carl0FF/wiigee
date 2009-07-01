@@ -27,6 +27,7 @@ package org.wiigee.device;
 import java.io.IOException;
 import java.util.EventObject;
 
+import java.util.Vector;
 import javax.bluetooth.L2CAPConnection;
 
 import org.wiigee.event.ButtonPressedEvent;
@@ -42,30 +43,18 @@ import org.wiigee.util.Log;
  */
 public class WiimoteStreamer extends Thread {
 
-    private int psimin = Integer.MAX_VALUE;
-    private int psimax = Integer.MIN_VALUE;
-    private int thetamin = Integer.MAX_VALUE;
-    private int thetamax = Integer.MIN_VALUE;
-    private int phimin = Integer.MAX_VALUE;
-    private int phimax = Integer.MIN_VALUE;
+	private boolean running;
+	private double x0, x1, y0, y1, z0, z1;
+    private double psi0, theta0, phi0;
+    private boolean wmpcalibrated;
+    private int calibrationcounter;
+    private Vector<double[]> calibrationsequence;
 
-    private int minx = Integer.MAX_VALUE;
-    private int maxx = Integer.MIN_VALUE;
-    private int miny = Integer.MAX_VALUE;
-    private int maxy = Integer.MIN_VALUE;
-    private int minz = Integer.MAX_VALUE;
-    private int maxz = Integer.MIN_VALUE;
-
-
-
-	boolean running;
-	double x0, x1, y0, y1, z0, z1;
-
-	Wiimote wiimote;
+	private Wiimote wiimote;
 
 	private L2CAPConnection receiveCon;
 
-	EventObject lastevent;
+	private EventObject lastevent;
 
 	protected WiimoteStreamer(Wiimote wiimote) {
 		this.wiimote = wiimote;
@@ -75,8 +64,8 @@ public class WiimoteStreamer extends Thread {
     @Override
 	public void run() {
 		this.running = true;
-		int xraw, yraw, zraw;
-		double x, y, z;
+        this.calibrationcounter = 0;
+        this.calibrationsequence = new Vector<double[]>();
 
 		try {
 			while (running) {
@@ -211,9 +200,9 @@ public class WiimoteStreamer extends Thread {
     private void handleWiiMotionPlusData(byte[] data) {
 
         // fixed values until calibration procedure is known
-        int psi0 = 8265;
-        int theta0 = 7963;
-        int phi0 = 7923;
+        //int psi0 = 8265;
+        //int theta0 = 7963;
+        //int phi0 = 7923;
 
         //this.printBytes(new byte[]{ data[3], data[4], data[5]});
 
@@ -231,16 +220,41 @@ public class WiimoteStreamer extends Thread {
         int thetaRAW = thetaU + thetaL;
         int phiRAW = phiU + phiL;
 
-        //Log.write("psi="+psi+" theta="+theta+" phi"+phi);
+        // average of 50 samples for calibration
+        if(!this.wmpcalibrated) {
+            if(this.calibrationcounter++<50) {
+                this.calibrationsequence.add(new double[] {psiRAW, thetaRAW, phiRAW});
+            } else {
+                this.calibrateWiiMotionPlus();
+            }
+        } else { // is calibrated
+            // calculate degrees per second movement
+            double psi = (double)(psiRAW - psi0) / 20.0;
+            double theta = (double)(thetaRAW - theta0) / 20.0;
+            double phi = (double)(phiRAW - phi0) / 20.0;
 
-        // calculate degrees per second movement
-        double psi = (double)(psiRAW - psi0) / 20.0;
-        double theta = (double)(thetaRAW - theta0) / 20.0;
-        double phi = (double)(phiRAW - phi0) / 20.0;
+            this.wiimote.fireRotationSpeedEvent(new
+                    double[] { -psi, -theta, -phi });
+        }
 
-        this.wiimote.fireRotationSpeedEvent(new
-                double[] { -psi, -theta, -phi });
+    }
 
+    /**
+     * Build an average of the presaved rotation sequences to have a reference
+     * value for 'not rotating'. This is a kind of calibration until the original
+     * calibration procedure for the wii motion plus is known.
+     */
+    private void calibrateWiiMotionPlus() {
+        for(int i=0; i<this.calibrationsequence.size(); i++) {
+            this.psi0 += this.calibrationsequence.elementAt(i)[0];
+            this.theta0 += this.calibrationsequence.elementAt(i)[1];
+            this.phi0 += this.calibrationsequence.elementAt(i)[2];
+        }
+        this.psi0 /= this.calibrationsequence.size();
+        this.theta0 /= this.calibrationsequence.size();
+        this.phi0 /= this.calibrationsequence.size();
+        this.wmpcalibrated = true;
+        Log.write("Wii Motion Plus calibrated manually!");
     }
 
     /**
