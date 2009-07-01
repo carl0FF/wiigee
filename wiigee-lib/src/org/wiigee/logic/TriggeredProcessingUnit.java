@@ -83,11 +83,11 @@ public class TriggeredProcessingUnit extends ProcessingUnit {
 	}
 	
 	public void motionStartReceived(MotionStartEvent event) {
-		this.handleStartEvent(event);
+		// this.handleStartEvent(event);
 	}
 	
 	public void motionStopReceived(MotionStopEvent event) {
-		this.handleStopEvent(event);
+		// this.handleStopEvent(event);
 	}
 	
 	public void handleStartEvent(ActionStartEvent event) {
@@ -97,7 +97,6 @@ public class TriggeredProcessingUnit extends ProcessingUnit {
 			event.isTrainInitEvent()) {
 			Log.write("Training started!");
 			this.learning=true;
-			this.fireStateEvent(1);
 		}
 		
 		// RecognitionButton = record a gesture for recognition
@@ -105,7 +104,6 @@ public class TriggeredProcessingUnit extends ProcessingUnit {
 			event.isRecognitionInitEvent()) {
 			Log.write("Recognition started!");
 			this.analyzing=true;
-			this.fireStateEvent(2);
 		}
 			
 		// CloseGestureButton = starts the training of the model with multiple
@@ -115,7 +113,6 @@ public class TriggeredProcessingUnit extends ProcessingUnit {
 		
 			if(this.trainsequence.size()>0) {
 				Log.write("Training the model with "+this.trainsequence.size()+" gestures...");
-				this.fireStateEvent(1);
 				this.learning=true;
 				
 				GestureModel m = new GestureModel();
@@ -156,12 +153,12 @@ public class TriggeredProcessingUnit extends ProcessingUnit {
 				int recognized = this.classifier.classifyGesture(gesture);
 				if(recognized!=-1) {
 					double recogprob = this.classifier.getLastProbability();
-					this.fireGestureEvent(recognized, recogprob);
+					this.fireGestureEvent(true, recognized, recogprob);
 					Log.write("######");
 					Log.write("Gesture No. "+recognized+" recognized: "+recogprob);
 					Log.write("######");
 				} else {
-					this.fireStateEvent(0);
+					this.fireGestureEvent(false, 0, 0.0);
 					Log.write("######");
 					Log.write("No gesture recognized.");
 					Log.write("######");

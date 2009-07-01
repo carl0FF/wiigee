@@ -2,10 +2,13 @@ package wiigeegui;
 
 import com.sun.j3d.utils.geometry.ColorCube;
 import com.sun.j3d.utils.universe.SimpleUniverse;
+import java.awt.BorderLayout;
+import java.awt.event.ComponentEvent;
 import org.wiigee.event.AccelerationEvent;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
+import java.awt.event.ComponentListener;
 import javax.media.j3d.BranchGroup;
 import javax.media.j3d.Canvas3D;
 import javax.media.j3d.Transform3D;
@@ -19,6 +22,7 @@ import org.wiigee.event.RotationEvent;
  */
 public class OrientationPanel extends JPanel {
 
+    Canvas3D canvas;
     TransformGroup transgroup;
 
     public OrientationPanel() {
@@ -26,11 +30,13 @@ public class OrientationPanel extends JPanel {
 
         System.out.println("loading canvas3d");
 
+        this.setLayout(new BorderLayout());
+
         GraphicsConfiguration config = SimpleUniverse.getPreferredConfiguration();
-        Canvas3D canvas = new Canvas3D(config);
-        canvas.setFocusable(true);
-        canvas.requestFocus();
-        SimpleUniverse universe = new SimpleUniverse(canvas);
+        this.canvas = new Canvas3D(config);
+        this.canvas.setFocusable(true);
+        this.canvas.requestFocus();
+        SimpleUniverse universe = new SimpleUniverse(this.canvas);
         universe.getViewingPlatform().setNominalViewingTransform();
 
         //Add components
@@ -47,11 +53,7 @@ public class OrientationPanel extends JPanel {
         
         universe.addBranchGraph(objRoot);
 
-        // fixed size at the moment...
-        canvas.setSize(423, 230);
-        add(canvas);
-
-        this.repaint();
+        add(this.canvas);
     }
 
     public void setRotation(RotationEvent e) {

@@ -21,7 +21,6 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
 package org.wiigee.event;
 
 import org.wiigee.logic.ProcessingUnit;
@@ -36,31 +35,37 @@ import org.wiigee.logic.ProcessingUnit;
  */
 public class GestureEvent {
 
-	int id;
-	double probability;
-	ProcessingUnit analyzer;
-	
-	/** Create a GestureEvent
-	 * 
-	 * @param source The Source, which detected the gesture.
-	 * @param id A gesture ID for identifying a gesture. 
-	 * @param probability The Bayes-Classifier calculated probability.
-	 */
-	public GestureEvent(ProcessingUnit source, int id, double probability) {
-		this.analyzer=source;
-		this.id=id;
-		this.probability=probability;
-	}
-	
-	public int getId() {
-		return this.id;
-	}
-	
-	public double getProbability() {
-		return this.probability;
-	}
-	
-	public ProcessingUnit getSource() {
-		return this.analyzer;
-	}
+    int id;
+    boolean valid;
+    double probability;
+    ProcessingUnit analyzer;
+
+    /** Create a GestureEvent
+     *
+     * @param source The Source, which detected the gesture.
+     * @param id A gesture ID for identifying a gesture.
+     * @param probability The Bayes-Classifier calculated probability.
+     */
+    public GestureEvent(ProcessingUnit source, boolean valid, int id, double probability) {
+        this.analyzer = source;
+        this.valid = valid;
+        this.id = id;
+        this.probability = probability;
+    }
+
+    public int getId() {
+        return this.id;
+    }
+
+    public boolean isValid() {
+        return this.valid;
+    }
+
+    public double getProbability() {
+        return this.probability;
+    }
+
+    public ProcessingUnit getSource() {
+        return this.analyzer;
+    }
 }
