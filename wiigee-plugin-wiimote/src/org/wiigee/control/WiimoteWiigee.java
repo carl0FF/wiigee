@@ -38,8 +38,8 @@ import org.wiigee.filter.Filter;
 // Singleton
 public class WiimoteWiigee extends Wiigee {
 
-    protected static String pluginversion = "1.5.3 alpha";
-    protected static String pluginreleasedate = "20090626";
+    protected static String pluginversion = "1.5.4 alpha";
+    protected static String pluginreleasedate = "20090706";
     private static final Object lock = new Object();
     private Vector<Wiimote> devices;
 

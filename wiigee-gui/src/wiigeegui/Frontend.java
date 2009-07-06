@@ -18,6 +18,7 @@ import org.wiigee.event.ButtonReleasedEvent;
 import org.wiigee.event.AccelerationListener;
 import org.wiigee.event.GestureEvent;
 import org.wiigee.event.GestureListener;
+import org.wiigee.event.InfraredEvent;
 import org.wiigee.event.MotionStartEvent;
 import org.wiigee.event.MotionStopEvent;
 import org.wiigee.event.RotationEvent;
@@ -34,6 +35,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.filechooser.FileFilter;
 import org.wiigee.event.ButtonListener;
+import org.wiigee.event.InfraredListener;
 import org.wiigee.event.RotationListener;
 import org.wiigee.filter.HighPassFilter;
 import org.wiigee.filter.RotationResetFilter;
@@ -45,7 +47,7 @@ import org.wiigee.util.Log;
  * @author bepo
  */
 public class Frontend extends javax.swing.JFrame implements GestureListener,
-        AccelerationListener, ButtonListener, RotationListener {
+        AccelerationListener, ButtonListener, RotationListener, InfraredListener {
 
     private WiimoteWiigee wiigee;
     private Wiimote wiimote;
@@ -129,6 +131,10 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
         this.orientationPanel1.setRotation(event);
     }
 
+    public void infraredReceived(InfraredEvent event) {
+        this.infraredPanel1.setInfrared(event);
+    }
+
     public void appendToConsole(String s) {
         this.consoleTextArea.append(s+"\n\r");
     }
@@ -167,8 +173,11 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
         consoleScrollPane = new javax.swing.JScrollPane();
         consoleTextArea = new javax.swing.JTextArea();
         accelerationLabel = new javax.swing.JLabel();
+        infraredPanel = new javax.swing.JPanel();
+        infraredPanel1 = new wiigeegui.InfraredPanel();
         rotationPanel = new javax.swing.JPanel();
         orientationPanel1 = new wiigeegui.OrientationPanel();
+        settingsPanel = new javax.swing.JPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
         wiimoteMenu = new javax.swing.JMenu();
         connectWiimoteItem = new javax.swing.JMenuItem();
@@ -439,6 +448,30 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
 
         jTabbedPane1.addTab("Gestures", gesturePanel);
 
+        org.jdesktop.layout.GroupLayout infraredPanel1Layout = new org.jdesktop.layout.GroupLayout(infraredPanel1);
+        infraredPanel1.setLayout(infraredPanel1Layout);
+        infraredPanel1Layout.setHorizontalGroup(
+            infraredPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 649, Short.MAX_VALUE)
+        );
+        infraredPanel1Layout.setVerticalGroup(
+            infraredPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 734, Short.MAX_VALUE)
+        );
+
+        org.jdesktop.layout.GroupLayout infraredPanelLayout = new org.jdesktop.layout.GroupLayout(infraredPanel);
+        infraredPanel.setLayout(infraredPanelLayout);
+        infraredPanelLayout.setHorizontalGroup(
+            infraredPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(infraredPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        infraredPanelLayout.setVerticalGroup(
+            infraredPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(infraredPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        jTabbedPane1.addTab("Infrared", infraredPanel);
+
         org.jdesktop.layout.GroupLayout rotationPanelLayout = new org.jdesktop.layout.GroupLayout(rotationPanel);
         rotationPanel.setLayout(rotationPanelLayout);
         rotationPanelLayout.setHorizontalGroup(
@@ -453,6 +486,19 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
         orientationPanel1.getAccessibleContext().setAccessibleName("orientationPanel1");
 
         jTabbedPane1.addTab("Rotation", rotationPanel);
+
+        org.jdesktop.layout.GroupLayout settingsPanelLayout = new org.jdesktop.layout.GroupLayout(settingsPanel);
+        settingsPanel.setLayout(settingsPanelLayout);
+        settingsPanelLayout.setHorizontalGroup(
+            settingsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 649, Short.MAX_VALUE)
+        );
+        settingsPanelLayout.setVerticalGroup(
+            settingsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 734, Short.MAX_VALUE)
+        );
+
+        jTabbedPane1.addTab("Settings", settingsPanel);
 
         wiimoteMenu.setText("Wiimote");
 
@@ -631,9 +677,12 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
 
     private void setupWiimote() {
         try {
-            this.wiimote.disableAccelerationSensors();
-            this.wiimote.enableWiiMotionPlus();
-            //this.wiimote.addAccelerationFilter(new RotationResetFilter(this.wiimote));
+//            this.wiimote.enableInfraredCamera((byte)0x03);
+//            this.wiimote.sendRaw(new byte[]{Wiimote.CMD_SET_REPORT, 0x12, 0x00, 0x33});
+
+
+            //this.wiimote.enableWiiMotionPlus();
+            this.wiimote.enableInfraredAndWiiMotionPlus();
             this.wiimote.addAccelerationFilter(new HighPassFilter());
             this.wiimote.addRotationFilter(new RotationThresholdFilter(0.5));
             } catch(Exception e) {
@@ -645,6 +694,7 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
         this.wiimote.addButtonListener(this);
         this.wiimote.addRotationListener(this);
         this.wiimote.addGestureListener(this);
+        this.wiimote.addInfraredListener(this);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -662,6 +712,8 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
     private javax.swing.JDialog getGestureMeaningDialog;
     private wiigeegui.GraphPanel graphPanel1;
     private javax.swing.JTextField inMotionField;
+    private javax.swing.JPanel infraredPanel;
+    private wiigeegui.InfraredPanel infraredPanel1;
     private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -679,10 +731,12 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
     private javax.swing.JLabel scanWiimoteStatusLabel;
     private javax.swing.JDialog selectWiimoteDialog;
     private javax.swing.JButton setGestureMeaningButton;
+    private javax.swing.JPanel settingsPanel;
     private javax.swing.JTextField trainingField;
     private javax.swing.JMenu wiimoteMenu;
     private wiigeegui.WiimotePanel wiimotePanel1;
     private javax.swing.JTextField wiimotesMacTextField;
     // End of variables declaration//GEN-END:variables
+
 
 }

@@ -49,6 +49,10 @@ public class InfraredEvent extends EventObject {
 			this.valid[i] = (this.coordinates[i][0]<1023 && this.coordinates[i][1]<1023);
 		}
 	}
+
+        public boolean[] getValids() {
+            return this.valid;
+        }
 	
 	public boolean isValid(int i) {
 		return this.valid[i];

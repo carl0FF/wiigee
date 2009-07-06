@@ -21,7 +21,6 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
 package org.wiigee.device;
 
 import java.io.IOException;
@@ -43,107 +42,88 @@ import org.wiigee.util.Log;
  */
 public class WiimoteStreamer extends Thread {
 
-	private boolean running;
-	private double x0, x1, y0, y1, z0, z1;
+    private boolean running;
+    private double x0, x1, y0, y1, z0, z1;
     private double psi0, theta0, phi0;
     private boolean wmpcalibrated;
     private int calibrationcounter;
     private Vector<double[]> calibrationsequence;
+    private Wiimote wiimote;
+    private L2CAPConnection receiveCon;
+    private EventObject lastevent;
 
-	private Wiimote wiimote;
-
-	private L2CAPConnection receiveCon;
-
-	private EventObject lastevent;
-
-	protected WiimoteStreamer(Wiimote wiimote) {
-		this.wiimote = wiimote;
-		this.receiveCon = wiimote.getReceiveConnection();
-	}
+    protected WiimoteStreamer(Wiimote wiimote) {
+        this.wiimote = wiimote;
+        this.receiveCon = wiimote.getReceiveConnection();
+    }
 
     @Override
-	public void run() {
-		this.running = true;
+    public void run() {
+        this.running = true;
         this.calibrationcounter = 0;
         this.calibrationsequence = new Vector<double[]>();
 
-		try {
-			while (running) {
-				// connection has data and we're ready.
-				
-				byte[] b = this.getRaw(); // blocks application
+        try {
+            while (running) {
+                // connection has data and we're ready.
+
+                byte[] b = this.getRaw(); // blocks application
 
                 // Log.write("");
 
-				// debug output
+                // debug output
 				/* for(int i=0; i<b.length; i++) {
-				 * System.out.print((int)b[i]&0xFF); if(i==input.length-1) {
-				 * System.out.println(""); } else { System.out.print(":"); } }
-				 */
+                 * System.out.print((int)b[i]&0xFF); if(i==input.length-1) {
+                 * System.out.println(""); } else { System.out.print(":"); } }
+                 */
 
 
-				// infrared is enabled, so have a look at the last bytes
-				if (this.wiimote.infraredEnabled()
-						&& (b[1] & 0xFF) == 0x33) {
-                    this.handleButtonData(b[2], b[3]);
-                    this.handleInfraredData(
-                            new byte[] {b[7], b[8], b[9],
-                                        b[10], b[11], b[12],
-                                        b[13], b[14], b[15],
-                                        b[16], b[17], b[18]});
-                    // Log.write("Button + Irda");
-                }
-                
-                
-				// if the wiimote is sending acceleration data...
-                else if (this.wiimote.accelerationEnabled()
-                    && (    ((b[1] & 0xFF) == 0x31)
-                         || ((b[1] & 0xFF) == 0x33)
-                         || ((b[1] & 0xFF) == 0x35)
-                         || ((b[1] & 0xFF) == 0x37)
-                       )
-                   ) {
+                if((b[1] & 0xFF) == 0x31) {
                     this.handleButtonData(b[2], b[3]);
                     this.handleAccelerationData(new byte[] { b[4], b[5], b[6] });
-                    // Log.write("Button + Acc");
-				}
-
-                // if we are on channel 37: Button, Acceleration + Extension
+                    //Log.write("0x31: Button + Acc");
+                }
+                else if ((b[1] & 0xFF) == 0x33) {
+                    this.handleButtonData(b[2], b[3]);
+                    this.handleAccelerationData(new byte[]{b[4], b[5], b[6]});
+                    this.handleInfraredData(new byte[]{b[7], b[8], b[9],
+                                            b[10], b[11], b[12],
+                                            b[13], b[14], b[15],
+                                            b[16], b[17], b[18]});
+                    //Log.write("0x33: Button + Acc + Irda");
+                }
                 else if ((b[1] & 0xFF) == 0x37) {
                     this.handleButtonData(b[2], b[3]);
-                    this.handleAccelerationData(new byte[] { b[4], b[5], b[6] });
+                    this.handleAccelerationData(new byte[]{b[4], b[5], b[6]});
+                    this.handleInfraredData(
+                            new byte[]{b[7], b[8], b[9], b[10], b[11], b[12],
+                                       b[13], b[14], b[15], b[16]});
                     this.handleWiiMotionPlusData(
-                            new byte[] { b[17], b[18], b[19], b[20], b[21], b[22]});
-                    // Log.write("Button + Acc + Ext");
+                            new byte[]{b[17], b[18], b[19], b[20], b[21], b[22]});
+                    //Log.write("0x37: Button + Acc + Ext");
                 }
-
-                // retrieve raw data answers on channel 21
-                else if((b[1] & 0xFF) == 0x21) {
+                else if ((b[1] & 0xFF) == 0x21) {
                     this.handleButtonData(b[2], b[3]);
 
                     // calibration data
-                    if(   ((b[5] & 0xFF) == 0x00)
-                       && ((b[6] & 0xFF) == 0x20)) {
-                       this.handleCalibrationData(
-                               new byte[] {b[7], b[8], b[9], b[11], b[12], b[13]});
-                       // Log.write("Calibration result");
+                    if (((b[5] & 0xFF) == 0x00) && ((b[6] & 0xFF) == 0x20)) {
+                        this.handleCalibrationData(
+                                new byte[]{b[7], b[8], b[9], b[11], b[12], b[13]});
+                        // Log.write("0x21: Calibration result");
                     } else {
                         this.handleRawDataAnswer(
-                                new byte[] {b[5], b[6]},
-                                new byte[] {b[7], b[8], b[9], b[10], b[11], b[12],
-                                b[13], b[14], b[15], b[16], b[17], b[18], b[19], b[20],
-                                b[21], b[22]
-                        });
-                        // Log.write("Raw data answer");
+                                new byte[]{b[5], b[6]},
+                                new byte[]{b[7], b[8], b[9], b[10], b[11], b[12],
+                                    b[13], b[14], b[15], b[16], b[17], b[18], b[19], b[20],
+                                    b[21], b[22]
+                                });
+                        // Log.write("0x21: Raw data answer");
                     }
 
                 }
-
-                // only extension data
-                else if((b[1] & 0xFF) == (byte)0x3d) {
-                    Log.write("Ext only");
+                else if ((b[1] & 0xFF) == (byte) 0x3d) {
+                    Log.write("0x3D: Ext only");
                 }
-
                 else {
                     Log.write("Unknown data retrieved.");
                     this.printBytes(b);
@@ -151,13 +131,13 @@ public class WiimoteStreamer extends Thread {
 
 
 
-			} // while(running)
+            } // while(running)
 
-		} catch (IOException e) {
-			Log.write("Streamer: Connection to Wiimote lost.");
-			this.running = false;
-		}
-	}
+        } catch (IOException e) {
+            Log.write("Streamer: Connection to Wiimote lost.");
+            this.running = false;
+        }
+    }
 
     /**
      * Handles calibration Data
@@ -166,12 +146,12 @@ public class WiimoteStreamer extends Thread {
      */
     private void handleCalibrationData(byte[] data) {
         this.x0 = data[0] & 0xFF;
-		this.y0 = data[1] & 0xFF;
-		this.z0 = data[2] & 0xFF;
-		this.x1 = data[3] & 0xFF;
-		this.y1 = data[4] & 0xFF;
-		this.z1 = data[5] & 0xFF;
-		Log.write("Autocalibration successful!");
+        this.y0 = data[1] & 0xFF;
+        this.z0 = data[2] & 0xFF;
+        this.x1 = data[3] & 0xFF;
+        this.y1 = data[4] & 0xFF;
+        this.z1 = data[5] & 0xFF;
+        Log.write("Autocalibration successful!");
     }
 
     /**
@@ -184,9 +164,9 @@ public class WiimoteStreamer extends Thread {
         String out = "";
         String[] o = this.byte2hex(offset);
         String[] d = this.byte2hex(data);
-        out += "READ "+o[0]+""+o[1]+": ";
-        for(int i=0; i<d.length; i++) {
-            out += d[i]+" ";
+        out += "READ " + o[0] + "" + o[1] + ": ";
+        for (int i = 0; i < d.length; i++) {
+            out += d[i] + " ";
         }
         Log.write(out);
     }
@@ -221,20 +201,19 @@ public class WiimoteStreamer extends Thread {
         int phiRAW = phiU + phiL;
 
         // average of 50 samples for calibration
-        if(!this.wmpcalibrated) {
-            if(this.calibrationcounter++<50) {
-                this.calibrationsequence.add(new double[] {psiRAW, thetaRAW, phiRAW});
+        if (!this.wmpcalibrated) {
+            if (this.calibrationcounter++ < 50) {
+                this.calibrationsequence.add(new double[]{psiRAW, thetaRAW, phiRAW});
             } else {
                 this.calibrateWiiMotionPlus();
             }
         } else { // is calibrated
             // calculate degrees per second movement
-            double psi = (double)(psiRAW - psi0) / 20.0;
-            double theta = (double)(thetaRAW - theta0) / 20.0;
-            double phi = (double)(phiRAW - phi0) / 20.0;
+            double psi = (double) (psiRAW - psi0) / 20.0;
+            double theta = (double) (thetaRAW - theta0) / 20.0;
+            double phi = (double) (phiRAW - phi0) / 20.0;
 
-            this.wiimote.fireRotationSpeedEvent(new
-                    double[] { -psi, -theta, -phi });
+            this.wiimote.fireRotationSpeedEvent(new double[]{-psi, -theta, -phi});
         }
 
     }
@@ -245,7 +224,7 @@ public class WiimoteStreamer extends Thread {
      * calibration procedure for the wii motion plus is known.
      */
     private void calibrateWiiMotionPlus() {
-        for(int i=0; i<this.calibrationsequence.size(); i++) {
+        for (int i = 0; i < this.calibrationsequence.size(); i++) {
             this.psi0 += this.calibrationsequence.elementAt(i)[0];
             this.theta0 += this.calibrationsequence.elementAt(i)[1];
             this.phi0 += this.calibrationsequence.elementAt(i)[2];
@@ -266,23 +245,45 @@ public class WiimoteStreamer extends Thread {
      */
     private void handleInfraredData(byte[] data) {
         int[][] coordinates = new int[4][2];
-		int[] size = new int[4];
-		int j = 0;
+        int[] size = new int[] { 1, 1, 1, 1 };
+        int j = 0;
 
-		for (int i = 0; i < 12; i += 3) { // for each IR byte
-														// triple
-            int tailX = data[i] & 0xFF;
-            int tailY = data[i + 1] & 0xFF;
-            int preY = (data[i + 2] & 0xC0) << 2;
-            int preX = (data[i + 2] & 0x30) << 4;
+        // normal mode
+        if(data.length == 10) {
+            for(int i=0; i<10; i+=5) { // for each IR fife-byte segment
+                int tailX1 = data[i] & 0xFF;
+                int tailY1 = data[i+1] & 0xFF;
+                int preY1 = (data[i+2] & 0xC0) << 2;
+                int preX1 = (data[i+2] & 0x30) << 4;
+                int preY2 = (data[i+2] & 0x0C) << 6;
+                int preX2 = (data[i+2] & 0x03) << 8;
+                int tailX2 = data[i+3] & 0xFF;
+                int tailY2 = data[i+4] & 0xFF;
 
-            coordinates[j][0] = tailX + preX;
-            coordinates[j][1] = tailY + preY;
-            size[j++] = (data[i + 2] & 0x0F);
+                coordinates[j][0] = tailX1 + preX1;
+                coordinates[j][1] = tailY1 + preY1;
+                coordinates[j+1][0] = tailX2 + preX2;
+                coordinates[j+1][1] = tailY2 + preY2;
+                j+=2;
+            }
+            
+        } else if (data.length == 12) { // extended mode
+            for (int i = 0; i < 12; i += 3) { // for each IR byte
+                // triple
+                int tailX = data[i] & 0xFF;
+                int tailY = data[i + 1] & 0xFF;
+                int preY = (data[i + 2] & 0xC0) << 2;
+                int preX = (data[i + 2] & 0x30) << 4;
+
+                coordinates[j][0] = tailX + preX;
+                coordinates[j][1] = tailY + preY;
+                size[j++] = (data[i + 2] & 0x0F);
+            }
+
         }
 
-		this.wiimote.fireInfraredEvent(coordinates, size);
-        
+        this.wiimote.fireInfraredEvent(coordinates, size);
+
     }
 
     /**
@@ -294,15 +295,15 @@ public class WiimoteStreamer extends Thread {
     private void handleAccelerationData(byte[] data) {
         // convert to int.
         int xraw = (data[0] & 0xFF);
-		int yraw = (data[1] & 0xFF);
-		int zraw = (data[2] & 0xFF);
+        int yraw = (data[1] & 0xFF);
+        int zraw = (data[2] & 0xFF);
 
         // calculate acceleration with calibration data.
         double x = (double) (xraw - x0) / (double) (x1 - x0);
-		double y = (double) (yraw - y0) / (double) (y1 - y0);
-		double z = (double) (zraw - z0) / (double) (z1 - z0);
+        double y = (double) (yraw - y0) / (double) (y1 - y0);
+        double z = (double) (zraw - z0) / (double) (z1 - z0);
 
-		this.wiimote.fireAccelerationEvent(new double[] {x, y, z});
+        this.wiimote.fireAccelerationEvent(new double[]{x, y, z});
     }
 
     /**
@@ -313,114 +314,71 @@ public class WiimoteStreamer extends Thread {
      */
     private void handleButtonData(byte a, byte b) {
         // Button 1 matches button "2" on wiimote
-		if (((b & 0xFF) & 0x01) == 0x01
-            && !(this.lastevent instanceof ButtonPressedEvent)) {
-                this.wiimote.fireButtonPressedEvent(1);
-				this.lastevent = new ButtonPressedEvent(
-                                        this.wiimote, 1);
-		}
-
-		// Button 2 matches button "1" on wiimote
-		else if (((b & 0xFF) & 0x02) == 0x02
-                && !(this.lastevent instanceof ButtonPressedEvent)) {
-                    this.wiimote.fireButtonPressedEvent(2);
-                    this.lastevent = new ButtonPressedEvent(
-                                        this.wiimote, 2);
-		}
-
-		// Button 3 matches button "B" on wiimote
-		else if (((b & 0xFF) & 0x04) == 0x04
-				&& !(this.lastevent instanceof ButtonPressedEvent)) {
-					this.wiimote.fireButtonPressedEvent(3);
-					this.lastevent = new ButtonPressedEvent(
-                    					this.wiimote, 3);
-		}
-
-		// Button 4 matches button "A" on wiimote
-		else if (((b & 0xFF) & 0x08) == 0x08
-				&& !(this.lastevent instanceof ButtonPressedEvent)) {
-					this.wiimote.fireButtonPressedEvent(4);
-					this.lastevent = new ButtonPressedEvent(
-                    					this.wiimote, 4);
-		}
-
-		// Button 5 matches button "MINUS" on wiimote
-		else if (((b & 0xFF) & 0x10) == 0x10
-				&& !(this.lastevent instanceof ButtonPressedEvent)) {
-					this.wiimote.fireButtonPressedEvent(5);
-					this.lastevent = new ButtonPressedEvent(
-                        				this.wiimote, 5);
-		}
-
-		// Button 6 unknown
-		// Button 7 unknown
-
-		// Button 8 matches button "HOME" on wiimote
-		else if (((b & 0xFF) & 0x80) == 0x80
-				&& !(this.lastevent instanceof ButtonPressedEvent)) {
-					this.wiimote.fireButtonPressedEvent(8);
-					this.lastevent = new ButtonPressedEvent(
-                    					this.wiimote, 8);
-		}
-
-		// Button 9 matches "CROSS LEFT" on wiimote
-		else if (((a & 0xFF) & 0x01) == 0x01
-                && !(this.lastevent instanceof ButtonPressedEvent)) {
-					this.wiimote.fireButtonPressedEvent(9);
-					this.lastevent = new ButtonPressedEvent(
-                        			this.wiimote, 9);
-		}
-
-		// Button 10 matches "CROSS RIGHT" on wiimote
-		else if (((a & 0xFF) & 0x02) == 0x02
-				&& !(this.lastevent instanceof ButtonPressedEvent)) {
-					this.wiimote.fireButtonPressedEvent(10);
-					this.lastevent = new ButtonPressedEvent(
-                					this.wiimote, 10);
-		}
-
-		// Button 11 matches "CROSS DOWN" on wiimote
-		else if (((a & 0xFF) & 0x04) == 0x04
-				&& !(this.lastevent instanceof ButtonPressedEvent)) {
-					this.wiimote.fireButtonPressedEvent(11);
-					this.lastevent = new ButtonPressedEvent(
-                					this.wiimote, 11);
-		}
-
-		// Button 12 matches "CROSS UP" on wiimote
-		else if (((a & 0xFF) & 0x08) == 0x08
-				&& !(this.lastevent instanceof ButtonPressedEvent)) {
-					this.wiimote.fireButtonPressedEvent(12);
-					this.lastevent = new ButtonPressedEvent(
-                					this.wiimote, 12);
-		}
-
-		// Button 13 matches button "PLUS" on wiimote
-		else if (((a & 0xFF) & 0x10) == 0x10
-				&& !(this.lastevent instanceof ButtonPressedEvent)) {
-					this.wiimote.fireButtonPressedEvent(13);
-					this.lastevent = new ButtonPressedEvent(
-                					this.wiimote, 13);
-		}
-
-		// Button 14 unknown
-		// Button 15 unknown
-		// Button 16 unknown
-
+        if (((b & 0xFF) & 0x01) == 0x01 && !(this.lastevent instanceof ButtonPressedEvent)) {
+            this.wiimote.fireButtonPressedEvent(1);
+            this.lastevent = new ButtonPressedEvent(
+                    this.wiimote, 1);
+        } // Button 2 matches button "1" on wiimote
+        else if (((b & 0xFF) & 0x02) == 0x02 && !(this.lastevent instanceof ButtonPressedEvent)) {
+            this.wiimote.fireButtonPressedEvent(2);
+            this.lastevent = new ButtonPressedEvent(
+                    this.wiimote, 2);
+        } // Button 3 matches button "B" on wiimote
+        else if (((b & 0xFF) & 0x04) == 0x04 && !(this.lastevent instanceof ButtonPressedEvent)) {
+            this.wiimote.fireButtonPressedEvent(3);
+            this.lastevent = new ButtonPressedEvent(
+                    this.wiimote, 3);
+        } // Button 4 matches button "A" on wiimote
+        else if (((b & 0xFF) & 0x08) == 0x08 && !(this.lastevent instanceof ButtonPressedEvent)) {
+            this.wiimote.fireButtonPressedEvent(4);
+            this.lastevent = new ButtonPressedEvent(
+                    this.wiimote, 4);
+        } // Button 5 matches button "MINUS" on wiimote
+        else if (((b & 0xFF) & 0x10) == 0x10 && !(this.lastevent instanceof ButtonPressedEvent)) {
+            this.wiimote.fireButtonPressedEvent(5);
+            this.lastevent = new ButtonPressedEvent(
+                    this.wiimote, 5);
+        } // Button 6 unknown
+        // Button 7 unknown
+        // Button 8 matches button "HOME" on wiimote
+        else if (((b & 0xFF) & 0x80) == 0x80 && !(this.lastevent instanceof ButtonPressedEvent)) {
+            this.wiimote.fireButtonPressedEvent(8);
+            this.lastevent = new ButtonPressedEvent(
+                    this.wiimote, 8);
+        } // Button 9 matches "CROSS LEFT" on wiimote
+        else if (((a & 0xFF) & 0x01) == 0x01 && !(this.lastevent instanceof ButtonPressedEvent)) {
+            this.wiimote.fireButtonPressedEvent(9);
+            this.lastevent = new ButtonPressedEvent(
+                    this.wiimote, 9);
+        } // Button 10 matches "CROSS RIGHT" on wiimote
+        else if (((a & 0xFF) & 0x02) == 0x02 && !(this.lastevent instanceof ButtonPressedEvent)) {
+            this.wiimote.fireButtonPressedEvent(10);
+            this.lastevent = new ButtonPressedEvent(
+                    this.wiimote, 10);
+        } // Button 11 matches "CROSS DOWN" on wiimote
+        else if (((a & 0xFF) & 0x04) == 0x04 && !(this.lastevent instanceof ButtonPressedEvent)) {
+            this.wiimote.fireButtonPressedEvent(11);
+            this.lastevent = new ButtonPressedEvent(
+                    this.wiimote, 11);
+        } // Button 12 matches "CROSS UP" on wiimote
+        else if (((a & 0xFF) & 0x08) == 0x08 && !(this.lastevent instanceof ButtonPressedEvent)) {
+            this.wiimote.fireButtonPressedEvent(12);
+            this.lastevent = new ButtonPressedEvent(
+                    this.wiimote, 12);
+        } // Button 13 matches button "PLUS" on wiimote
+        else if (((a & 0xFF) & 0x10) == 0x10 && !(this.lastevent instanceof ButtonPressedEvent)) {
+            this.wiimote.fireButtonPressedEvent(13);
+            this.lastevent = new ButtonPressedEvent(
+                    this.wiimote, 13);
+        } // Button 14 unknown
+        // Button 15 unknown
+        // Button 16 unknown
         // Button release
-        else if((      ((a & 0xFF) == 0x20)
-                    || ((a & 0xFF) == 0x40)
-                    || ((a & 0xFF) == 0x60)
-                ) &&
-                (
-                       ((b & 0xFF) == 0x20)
-                    || ((b & 0xFF) == 0x40)
-                    || ((b & 0xFF) == 0x60)
-                ) &&
-                !(this.lastevent instanceof ButtonReleasedEvent)
-                ) {
-                    this.wiimote.fireButtonReleasedEvent();
-                    this.lastevent = new ButtonReleasedEvent(this.wiimote);
+        else if ((((a & 0xFF) == 0x20) || ((a & 0xFF) == 0x40) || ((a & 0xFF) == 0x60)) &&
+                (((b & 0xFF) == 0x20) || ((b & 0xFF) == 0x40) || ((b & 0xFF) == 0x60)) &&
+                !(this.lastevent instanceof ButtonReleasedEvent)) {
+            this.wiimote.fireButtonReleasedEvent();
+            this.lastevent = new ButtonReleasedEvent(this.wiimote);
         }
     }
 
@@ -430,26 +388,26 @@ public class WiimoteStreamer extends Thread {
      * @return The 23 retrieved bytes.
      * @throws java.io.IOException
      */
-	private byte[] getRaw() throws IOException {
-		byte[] b = new byte[23];
-		this.receiveCon.receive(b);
-		return b;
-	}
+    private byte[] getRaw() throws IOException {
+        byte[] b = new byte[23];
+        this.receiveCon.receive(b);
+        return b;
+    }
 
-	/**
-	 * Stops this thread.
-	 */
-	protected void stopThread() {
-		this.running = false;
-	}
+    /**
+     * Stops this thread.
+     */
+    protected void stopThread() {
+        this.running = false;
+    }
 
     /**
      * true if thread is running.
      * @return true if thread is running, false otherwise.
      */
-	protected boolean isRunning() {
-		return this.running;
-	}
+    protected boolean isRunning() {
+        return this.running;
+    }
 
     /**
      * Prints a byte stream as hex string.
@@ -458,8 +416,8 @@ public class WiimoteStreamer extends Thread {
     private void printBytes(byte[] b) {
         String out = "";
         String[] s = this.byte2hex(b);
-        for(int i=0; i<s.length; i++) {
-            out += " "+s[i];
+        for (int i = 0; i < s.length; i++) {
+            out += " " + s[i];
         }
         Log.write(out);
     }
@@ -470,17 +428,17 @@ public class WiimoteStreamer extends Thread {
      * @param b
      * @return
      */
-	private String[] byte2hex(byte[] b) {
-		String[] out = new String[b.length];
-		String stmp = "";
-		for (int n = 0; n < b.length; n++) {
-			stmp = (java.lang.Integer.toHexString(b[n] & 0XFF));
-			if (stmp.length() == 1)
-				out[n] = ("0" + stmp).toUpperCase();
-			else
-				out[n] = stmp.toUpperCase();
-		}
-		return out;
-	}
-
+    private String[] byte2hex(byte[] b) {
+        String[] out = new String[b.length];
+        String stmp = "";
+        for (int n = 0; n < b.length; n++) {
+            stmp = (java.lang.Integer.toHexString(b[n] & 0XFF));
+            if (stmp.length() == 1) {
+                out[n] = ("0" + stmp).toUpperCase();
+            } else {
+                out[n] = stmp.toUpperCase();
+            }
+        }
+        return out;
+    }
 }

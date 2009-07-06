@@ -57,7 +57,7 @@ public class Wiimote extends Device {
     public static final byte CMD_SET_REPORT = 0x52;
 
     // IR Modes
-    public static final byte IR_MODE_STANDARD = 1;
+    public static final byte IR_MODE_STANDARD = 0x01;
     public static final byte IR_MODE_EXTENDED = 0x03;
 
     // Modes / Channels
@@ -377,12 +377,10 @@ public class Wiimote extends Device {
      * recognition of acceleration gestures during the increased data
      * size transmitted.
      */
-    public void enableInfraredCamera() throws IOException {
-        this.accelerationenabled = true;
+    public void enableInfraredCamera(byte infraredMode) throws IOException {
+
+        Log.write("Enabling INFRARED CAMERA...");
         this.infraredenabled = true;
-        if (!this.calibrated) {
-            this.calibrateAccelerometer();
-        }
 
         //write 0x04 to output 0x13
         this.sendRaw(new byte[]{CMD_SET_REPORT, 0x13, 0x04});
@@ -394,16 +392,16 @@ public class Wiimote extends Device {
         this.writeRegister(new byte[]{(byte) 0xb0, 0x00, 0x30}, new byte[]{0x08});
 
         // write sensivity block 1 to register 0xb00000
-        this.writeRegister(new byte[]{(byte) 0xb0, 0x00, 0x00}, new byte[]{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, (byte) 0x90, 0x00, (byte) 0xc0});
+        this.writeRegister(new byte[]{(byte) 0xb0, 0x00, 0x00}, new byte[]{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, (byte) 0x90, 0x00, (byte) 0x41});
 
         // write sensivity block 2 to register 0xb0001a
         this.writeRegister(new byte[]{(byte) 0xb0, 0x00, (byte) 0x1a}, new byte[]{0x40, 0x00});
 
         // write ir-mode to register 0xb00033
-        this.writeRegister(new byte[]{(byte) 0xb0, 0x00, 0x33}, new byte[]{0x03});
+        this.writeRegister(new byte[]{(byte) 0xb0, 0x00, 0x33}, new byte[]{infraredMode});
 
         // enable continuous acceleration and IR cam on channel 33
-        this.sendRaw(new byte[]{CMD_SET_REPORT, 0x12, 0x00, 0x33});
+        //this.sendRaw(new byte[]{CMD_SET_REPORT, 0x12, 0x00, 0x33});
     }
 
     /**
@@ -417,16 +415,16 @@ public class Wiimote extends Device {
 
         Log.write("Enabling WII MOTION PLUS..");
 
-        // write 0x55 to 0x04a600f0
-        //this.writeRegister(new byte[] {(byte)0xa6, 0x00, (byte)0xf0}, new byte[] {0x55});
-
-        // write 0x00 to 0x04a600fb
-        //this.writeRegister(new byte[] {(byte)0xa6, 0x00, (byte)0xfb}, new byte[] {0x00});
-
         // write 0x04 to 0x04a600fe to get wii m+ data within extension reports
         this.writeRegister(new byte[]{(byte) 0xa6, 0x00, (byte) 0xfe}, new byte[]{0x04});
 
         // enable extension byte containing channel 37
+        this.sendRaw(new byte[]{CMD_SET_REPORT, 0x12, 0x00, 0x37});
+    }
+
+    public void enableInfraredAndWiiMotionPlus() throws IOException {        
+        this.enableInfraredCamera((byte)0x01); // 10 bytes
+        this.enableWiiMotionPlus();
         this.sendRaw(new byte[]{CMD_SET_REPORT, 0x12, 0x00, 0x37});
     }
 
