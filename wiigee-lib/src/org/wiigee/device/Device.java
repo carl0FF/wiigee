@@ -49,7 +49,7 @@ public class Device {
     protected int closegesturebutton;
 
     // Functional
-    protected boolean accelerationenabled;
+    protected boolean accelerationEnabled;
 
     // Filters, can filter the data stream
     protected Vector<Filter> accfilters = new Vector<Filter>();
@@ -150,16 +150,8 @@ public class Device {
         return this.processingunit;
     }
 
-    public boolean accelerationEnabled() {
-        return this.accelerationenabled;
-    }
-
-    public void enableAccelerationSensors() throws IOException {
-        this.accelerationenabled = true;
-    }
-
-    public void disableAccelerationSensors() throws IOException {
-        this.accelerationenabled = false;
+    public void setAccelerationEnabled(boolean enabled) throws IOException {
+        this.accelerationEnabled = enabled;
     }
 
     public void loadGesture(String filename) {

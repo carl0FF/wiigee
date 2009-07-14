@@ -72,7 +72,6 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
             this.gestureField.setText("No Gesture recognized!");
             this.appendToConsole("No Gesture recognized!");
         }
-        
     }
 
     public void accelerationReceived(AccelerationEvent event) {
@@ -122,9 +121,7 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
     }
 
     public void rotationSpeedReceived(RotationSpeedEvent event) {
-        //Log.write("Rotspeed: psi="+event.getPsi()+
-        //        " theta="+event.getTheta()+
-        //        " phi="+event.getPhi());
+        // nothing to do with this data
     }
 
     public void rotationReceived(RotationEvent event) {
@@ -139,6 +136,25 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
         this.consoleTextArea.append(s+"\n\r");
     }
 
+    private void setupWiimote() {
+        try {
+            this.wiimote.setAccelerationEnabled(true);
+            //this.wiimote.setInfraredCameraEnabled(true);
+            //this.wiimote.setWiiMotionPlusEnabled(true);
+            this.wiimote.addAccelerationFilter(new HighPassFilter());
+            this.wiimote.addRotationFilter(new RotationThresholdFilter(0.5));
+        } catch(Exception e) {
+                Log.write("Grosser Mist: setupWiimote()");
+                e.printStackTrace();
+        }
+
+        this.wiimote.addAccelerationListener(this);
+        this.wiimote.addButtonListener(this);
+        this.wiimote.addRotationListener(this);
+        this.wiimote.addGestureListener(this);
+        this.wiimote.addInfraredListener(this);
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -150,7 +166,7 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
 
         jFileChooser1 = new javax.swing.JFileChooser();
         selectWiimoteDialog = new javax.swing.JDialog();
-        jPanel1 = new javax.swing.JPanel();
+        selectWiimotePanel = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         wiimotesMacTextField = new javax.swing.JTextField();
         connectWiimoteButton = new javax.swing.JButton();
@@ -158,7 +174,7 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
         scanWiimoteStatusLabel = new javax.swing.JLabel();
         scanWiimoteApproveButton = new javax.swing.JButton();
         getGestureMeaningDialog = new javax.swing.JDialog();
-        jPanel2 = new javax.swing.JPanel();
+        getGestureMeaningPanel = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         gestureMeaningTextField = new javax.swing.JTextField();
         setGestureMeaningButton = new javax.swing.JButton();
@@ -178,6 +194,18 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
         rotationPanel = new javax.swing.JPanel();
         orientationPanel1 = new wiigeegui.OrientationPanel();
         settingsPanel = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jCheckBox1 = new javax.swing.JCheckBox();
+        infraredCheckBox = new javax.swing.JCheckBox();
+        jLabel5 = new javax.swing.JLabel();
+        wiiMotionPlusCheckBox = new javax.swing.JCheckBox();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jCheckBox4 = new javax.swing.JCheckBox();
+        accelerationCheckBox = new javax.swing.JCheckBox();
+        jLabel8 = new javax.swing.JLabel();
+        robotMouseCheckBox = new javax.swing.JCheckBox();
         jMenuBar1 = new javax.swing.JMenuBar();
         wiimoteMenu = new javax.swing.JMenu();
         connectWiimoteItem = new javax.swing.JMenuItem();
@@ -186,6 +214,8 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
         fileMenu = new javax.swing.JMenu();
         loadGesturesItem = new javax.swing.JMenuItem();
         saveGesturesItem = new javax.swing.JMenuItem();
+        helpMenu = new javax.swing.JMenu();
+        aboutItem = new javax.swing.JMenuItem();
 
         jFileChooser1.setAcceptAllFileFilterUsed(false);
         jFileChooser1.setFileFilter(new FileFilter() {
@@ -201,9 +231,8 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
         selectWiimoteDialog.setTitle("Connect");
         selectWiimoteDialog.setModal(true);
         selectWiimoteDialog.setName("selectWiimoteDialog"); // NOI18N
-        selectWiimoteDialog.setResizable(false);
 
-        jPanel1.setMinimumSize(new java.awt.Dimension(315, 125));
+        selectWiimotePanel.setMinimumSize(new java.awt.Dimension(315, 125));
 
         jLabel1.setText("Please enter the Wiimote's Bluetooth MAC:");
 
@@ -216,21 +245,21 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
             }
         });
 
-        org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
+        org.jdesktop.layout.GroupLayout selectWiimotePanelLayout = new org.jdesktop.layout.GroupLayout(selectWiimotePanel);
+        selectWiimotePanel.setLayout(selectWiimotePanelLayout);
+        selectWiimotePanelLayout.setHorizontalGroup(
+            selectWiimotePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, selectWiimotePanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                .add(selectWiimotePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(connectWiimoteButton)
                     .add(org.jdesktop.layout.GroupLayout.LEADING, jLabel1)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, wiimotesMacTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE))
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, wiimotesMacTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE))
                 .addContainerGap())
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1Layout.createSequentialGroup()
+        selectWiimotePanelLayout.setVerticalGroup(
+            selectWiimotePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(selectWiimotePanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -244,11 +273,11 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
         selectWiimoteDialog.getContentPane().setLayout(selectWiimoteDialogLayout);
         selectWiimoteDialogLayout.setHorizontalGroup(
             selectWiimoteDialogLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 305, Short.MAX_VALUE)
+            .add(selectWiimotePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         selectWiimoteDialogLayout.setVerticalGroup(
             selectWiimoteDialogLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .add(selectWiimotePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         selectWiimoteDialog.getAccessibleContext().setAccessibleParent(this);
@@ -308,21 +337,21 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
             }
         });
 
-        org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel2Layout.createSequentialGroup()
+        org.jdesktop.layout.GroupLayout getGestureMeaningPanelLayout = new org.jdesktop.layout.GroupLayout(getGestureMeaningPanel);
+        getGestureMeaningPanel.setLayout(getGestureMeaningPanelLayout);
+        getGestureMeaningPanelLayout.setHorizontalGroup(
+            getGestureMeaningPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, getGestureMeaningPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                .add(getGestureMeaningPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(setGestureMeaningButton)
                     .add(org.jdesktop.layout.GroupLayout.LEADING, gestureMeaningTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE)
                     .add(org.jdesktop.layout.GroupLayout.LEADING, jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel2Layout.createSequentialGroup()
+        getGestureMeaningPanelLayout.setVerticalGroup(
+            getGestureMeaningPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(getGestureMeaningPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(jLabel2)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -336,11 +365,11 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
         getGestureMeaningDialog.getContentPane().setLayout(getGestureMeaningDialogLayout);
         getGestureMeaningDialogLayout.setHorizontalGroup(
             getGestureMeaningDialogLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+            .add(getGestureMeaningPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
         );
         getGestureMeaningDialogLayout.setVerticalGroup(
             getGestureMeaningDialogLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+            .add(getGestureMeaningPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -487,15 +516,114 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
 
         jTabbedPane1.addTab("Rotation", rotationPanel);
 
+        jLabel3.setText("Infrared:");
+
+        jLabel4.setText("Vibration:");
+
+        jCheckBox1.setText("On");
+
+        infraredCheckBox.setText("On");
+        infraredCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                infraredCheckBoxActionPerformed(evt);
+            }
+        });
+
+        jLabel5.setText("Wii MotionPlus:");
+
+        wiiMotionPlusCheckBox.setText("On");
+        wiiMotionPlusCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                wiiMotionPlusCheckBoxActionPerformed(evt);
+            }
+        });
+
+        jLabel6.setText("Acceleration:");
+
+        jLabel7.setText("Buttons:");
+
+        jCheckBox4.setSelected(true);
+        jCheckBox4.setText("On");
+        jCheckBox4.setEnabled(false);
+
+        accelerationCheckBox.setSelected(true);
+        accelerationCheckBox.setText("On");
+        accelerationCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                accelerationCheckBoxActionPerformed(evt);
+            }
+        });
+
+        jLabel8.setText("IR Mouse:");
+
+        robotMouseCheckBox.setText("On");
+        robotMouseCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                robotMouseCheckBoxActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout settingsPanelLayout = new org.jdesktop.layout.GroupLayout(settingsPanel);
         settingsPanel.setLayout(settingsPanelLayout);
         settingsPanelLayout.setHorizontalGroup(
             settingsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 649, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, settingsPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .add(settingsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(settingsPanelLayout.createSequentialGroup()
+                        .add(jLabel5)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(wiiMotionPlusCheckBox))
+                    .add(settingsPanelLayout.createSequentialGroup()
+                        .add(settingsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                            .add(jLabel7)
+                            .add(jLabel6)
+                            .add(jLabel3))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(settingsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(accelerationCheckBox)
+                            .add(jCheckBox4)
+                            .add(infraredCheckBox))))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 333, Short.MAX_VALUE)
+                .add(settingsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(jLabel4)
+                    .add(jLabel8))
+                .add(18, 18, 18)
+                .add(settingsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jCheckBox1)
+                    .add(robotMouseCheckBox))
+                .addContainerGap())
         );
         settingsPanelLayout.setVerticalGroup(
             settingsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 734, Short.MAX_VALUE)
+            .add(settingsPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .add(settingsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(settingsPanelLayout.createSequentialGroup()
+                        .add(settingsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(jCheckBox1)
+                            .add(jLabel4))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(settingsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(jLabel8)
+                            .add(robotMouseCheckBox)))
+                    .add(settingsPanelLayout.createSequentialGroup()
+                        .add(settingsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(jCheckBox4)
+                            .add(jLabel7))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(settingsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(jLabel6)
+                            .add(accelerationCheckBox))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(settingsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(infraredCheckBox)
+                            .add(jLabel3))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(settingsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(wiiMotionPlusCheckBox)
+                            .add(jLabel5))))
+                .addContainerGap(619, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Settings", settingsPanel);
@@ -548,6 +676,18 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
 
         jMenuBar1.add(fileMenu);
 
+        helpMenu.setText("Help");
+
+        aboutItem.setText("About");
+        aboutItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                aboutItemActionPerformed(evt);
+            }
+        });
+        helpMenu.add(aboutItem);
+
+        jMenuBar1.add(helpMenu);
+
         setJMenuBar(jMenuBar1);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
@@ -558,7 +698,7 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jTabbedPane1)
+            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 780, Short.MAX_VALUE)
         );
 
         pack();
@@ -675,29 +815,45 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
         }
     }//GEN-LAST:event_loadGesturesItemActionPerformed
 
-    private void setupWiimote() {
+    private void infraredCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_infraredCheckBoxActionPerformed
         try {
-//            this.wiimote.enableInfraredCamera((byte)0x03);
-//            this.wiimote.sendRaw(new byte[]{Wiimote.CMD_SET_REPORT, 0x12, 0x00, 0x33});
+            this.wiimote.setInfraredCameraEnabled(infraredCheckBox.isSelected());
+        } catch(Exception e) {
+            Log.write("Error while activating Infrared Camera:");
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_infraredCheckBoxActionPerformed
 
+    private void wiiMotionPlusCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_wiiMotionPlusCheckBoxActionPerformed
+        try {
+            this.wiimote.setWiiMotionPlusEnabled(wiiMotionPlusCheckBox.isSelected());
+        } catch(Exception e) {
+            Log.write("Error while activating Wii MotionPlus:");
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_wiiMotionPlusCheckBoxActionPerformed
 
-            //this.wiimote.enableWiiMotionPlus();
-            this.wiimote.enableInfraredAndWiiMotionPlus();
-            this.wiimote.addAccelerationFilter(new HighPassFilter());
-            this.wiimote.addRotationFilter(new RotationThresholdFilter(0.5));
-            } catch(Exception e) {
-                Log.write("Grosser Mist: setupWiimote()");
-                e.printStackTrace();
-            }
+    private void accelerationCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_accelerationCheckBoxActionPerformed
+        try {
+            this.wiimote.setAccelerationEnabled(accelerationCheckBox.isSelected());
+        } catch(Exception e) {
+            Log.write("Error while activating Acceleration:");
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_accelerationCheckBoxActionPerformed
 
-        this.wiimote.addAccelerationListener(this);
-        this.wiimote.addButtonListener(this);
-        this.wiimote.addRotationListener(this);
-        this.wiimote.addGestureListener(this);
-        this.wiimote.addInfraredListener(this);
-    }
+    private void robotMouseCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_robotMouseCheckBoxActionPerformed
+        this.infraredPanel1.setRobotMouseEnabled(robotMouseCheckBox.isSelected());
+    }//GEN-LAST:event_robotMouseCheckBoxActionPerformed
+
+    private void aboutItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutItemActionPerformed
+        
+    }//GEN-LAST:event_aboutItemActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem aboutItem;
+    private javax.swing.JCheckBox accelerationCheckBox;
     private javax.swing.JLabel accelerationLabel;
     private javax.swing.JMenuItem autoconnectWiimoteItem;
     private javax.swing.JButton connectWiimoteButton;
@@ -710,29 +866,41 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
     private javax.swing.JTextField gestureMeaningTextField;
     private javax.swing.JPanel gesturePanel;
     private javax.swing.JDialog getGestureMeaningDialog;
+    private javax.swing.JPanel getGestureMeaningPanel;
     private wiigeegui.GraphPanel graphPanel1;
+    private javax.swing.JMenu helpMenu;
     private javax.swing.JTextField inMotionField;
+    private javax.swing.JCheckBox infraredCheckBox;
     private javax.swing.JPanel infraredPanel;
     private wiigeegui.InfraredPanel infraredPanel1;
+    private javax.swing.JCheckBox jCheckBox1;
+    private javax.swing.JCheckBox jCheckBox4;
     private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JMenuItem loadGesturesItem;
     private wiigeegui.OrientationPanel orientationPanel1;
     private javax.swing.JTextField recognitionField;
+    private javax.swing.JCheckBox robotMouseCheckBox;
     private javax.swing.JPanel rotationPanel;
     private javax.swing.JMenuItem saveGesturesItem;
     private javax.swing.JButton scanWiimoteApproveButton;
     private javax.swing.JDialog scanWiimoteDialog;
     private javax.swing.JLabel scanWiimoteStatusLabel;
     private javax.swing.JDialog selectWiimoteDialog;
+    private javax.swing.JPanel selectWiimotePanel;
     private javax.swing.JButton setGestureMeaningButton;
     private javax.swing.JPanel settingsPanel;
     private javax.swing.JTextField trainingField;
+    private javax.swing.JCheckBox wiiMotionPlusCheckBox;
     private javax.swing.JMenu wiimoteMenu;
     private wiigeegui.WiimotePanel wiimotePanel1;
     private javax.swing.JTextField wiimotesMacTextField;

@@ -44,22 +44,28 @@ public class InfraredPanel extends JPanel {
     // Constants
     public static final double DISTANCE_BETWEEN_SPOTS = 0.335; // meter
 
-    int[] middle;
-    int[] pointer;
-    int[][] coordinates;
-    boolean[] valid;
-    double distance;
-    int lastdeltaX;
-    int lastdeltaY;
+    private boolean robotMouseEnabled;
+    private int[] middle;
+    private int[] pointer;
+    private int[][] coordinates;
+    private boolean[] valid;
+    private double distance;
+    private int lastdeltaX;
+    private int lastdeltaY;
 
 
     public InfraredPanel() {
         super();
+        this.robotMouseEnabled = false;
         this.distance = 0.0;
         this.lastdeltaX = 0;
         this.lastdeltaY= 0;
         this.middle = new int[] { 0, 0 };
         this.pointer = new int[] { 0, 0 };
+    }
+
+    public void setRobotMouseEnabled(boolean enabled) {
+        this.robotMouseEnabled = enabled;
     }
 
     public void setInfrared(InfraredEvent event) {
@@ -94,7 +100,9 @@ public class InfraredPanel extends JPanel {
             this.pointer[1] = 768-y2+(int)(this.lastdeltaY*0.5);
         }
 
-        this.updateRobotMouse();
+        if(this.robotMouseEnabled) {
+            this.updateRobotMouse();
+        }
         this.repaint();
     }
 

@@ -92,8 +92,9 @@ public class Wiimote extends Device {
     // Functional
     private boolean vibrating;
     private boolean calibrated;
-    private boolean infraredenabled;
+    private boolean infraredEnabled;
     private WiimoteStreamer wms;
+    private boolean wiiMotionPlusEnabled;
 
     /**
      * Creates a new wiimote-device with a specific bluetooth mac-adress.
@@ -118,8 +119,8 @@ public class Wiimote extends Device {
             this.connect();
             this.calibrateAccelerometer();
             this.streamData(true);
-            this.enableAccelerationSensors();
             this.setLED(1);
+            this.setAccelerationEnabled(true);
         }
     }
 
@@ -332,6 +333,48 @@ public class Wiimote extends Device {
     }
 
     /**
+     * Updates the report channel according to the choosen
+     * functions that are enabled (acceleration, irda, ...).
+     *
+     */
+    private void updateReportChannel() throws IOException {
+        if(!accelerationEnabled
+        && !wiiMotionPlusEnabled
+        && !infraredEnabled) {
+            this.sendRaw(new byte[]{CMD_SET_REPORT, 0x12, 0x00, 0x30});
+        }
+        else if(accelerationEnabled
+             && !wiiMotionPlusEnabled
+             && !infraredEnabled) {
+            this.sendRaw(new byte[]{CMD_SET_REPORT, 0x12, 0x04, 0x31});
+        }
+        else if(!accelerationEnabled
+             && wiiMotionPlusEnabled
+             && !infraredEnabled) {
+            this.sendRaw(new byte[]{CMD_SET_REPORT, 0x12, 0x00, 0x32});
+        }
+        else if(accelerationEnabled
+             && wiiMotionPlusEnabled
+             && !infraredEnabled) {
+            this.sendRaw(new byte[]{CMD_SET_REPORT, 0x12, 0x04, 0x35});
+        }
+        else if(accelerationEnabled
+             && !wiiMotionPlusEnabled
+             && infraredEnabled) {
+            this.sendRaw(new byte[]{CMD_SET_REPORT, 0x12, 0x04, 0x33});
+        }
+        else if(accelerationEnabled
+             && wiiMotionPlusEnabled
+             && infraredEnabled) {
+            this.sendRaw(new byte[]{CMD_SET_REPORT, 0x12, 0x04, 0x37});
+        }
+        else {
+            // default channel - fallback to button only.
+            this.sendRaw(new byte[]{CMD_SET_REPORT, 0x12, 0x00, 0x30});
+        }
+    }
+
+    /**
      * Initializes the calibration of the accerlerometer. This is done once
      * per each controller in program lifetime.
      *
@@ -350,24 +393,32 @@ public class Wiimote extends Device {
      *
      */
     @Override
-    public void enableAccelerationSensors() throws IOException {
-        super.enableAccelerationSensors();
-        if (!this.calibrated) {
-            this.calibrateAccelerometer();
+    public void setAccelerationEnabled(boolean enabled) throws IOException {
+        super.setAccelerationEnabled(enabled);
+        if(enabled) {
+            Log.write("Enabling ACCELEROMETER...");
+            this.accelerationEnabled = true;
+            if (!this.calibrated) {
+                this.calibrateAccelerometer();
+            }
+        } else {
+            Log.write("Disabling ACCELEROMETER...");
+            this.accelerationEnabled = false;
         }
-
-        // enable acceleration in continuous mode
-        this.sendRaw(new byte[]{CMD_SET_REPORT, 0x12, 0x04, 0x31});
+       
+       // change channel dynamically
+       this.updateReportChannel();
     }
 
     /**
-     * Deactivates the acceleration sensors.
+     * Enables or disables the infrared camera of the wiimote with
+     * the default values.
      *
+     * @param e Should the Infrared Camera be enabled.
+     * @throws IOException In case of a connection error.
      */
-    @Override
-    public void disableAccelerationSensors() throws IOException {
-        super.disableAccelerationSensors();
-        this.sendRaw(new byte[]{CMD_SET_REPORT, 0x12, 0x00, 0x30});
+    public void setInfraredCameraEnabled(boolean enabled) throws IOException {
+        this.setInfraredCameraEnabled(enabled, Wiimote.IR_MODE_STANDARD);
     }
 
     /**
@@ -376,32 +427,41 @@ public class Wiimote extends Device {
      * to a lot of amazing stuff. Using this Mode could slow down the
      * recognition of acceleration gestures during the increased data
      * size transmitted.
+     *
+     * @param e Should the Infrared Camera be enabled.
+     * @param infraredMode The choosen Infrared Camera Mode.
+     * @throws IOException In case of a connection error.
+     *
      */
-    public void enableInfraredCamera(byte infraredMode) throws IOException {
+    public void setInfraredCameraEnabled(boolean enabled, byte infraredMode) throws IOException {
+        if(enabled) {
+            Log.write("Enabling INFRARED CAMERA...");
+            this.infraredEnabled = true;
 
-        Log.write("Enabling INFRARED CAMERA...");
-        this.infraredenabled = true;
+            //write 0x04 to output 0x13
+            this.sendRaw(new byte[]{CMD_SET_REPORT, 0x13, 0x04});
 
-        //write 0x04 to output 0x13
-        this.sendRaw(new byte[]{CMD_SET_REPORT, 0x13, 0x04});
+            // write 0x04 to output 0x1a
+            this.sendRaw(new byte[]{CMD_SET_REPORT, 0x1a, 0x04});
 
-        // write 0x04 to output 0x1a
-        this.sendRaw(new byte[]{CMD_SET_REPORT, 0x1a, 0x04});
+            // write 0x08 to reguster 0xb00030
+            this.writeRegister(new byte[]{(byte) 0xb0, 0x00, 0x30}, new byte[]{0x08});
 
-        // write 0x08 to reguster 0xb00030
-        this.writeRegister(new byte[]{(byte) 0xb0, 0x00, 0x30}, new byte[]{0x08});
+            // write sensivity block 1 to register 0xb00000
+            this.writeRegister(new byte[]{(byte) 0xb0, 0x00, 0x00}, new byte[]{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, (byte) 0x90, 0x00, (byte) 0x41});
 
-        // write sensivity block 1 to register 0xb00000
-        this.writeRegister(new byte[]{(byte) 0xb0, 0x00, 0x00}, new byte[]{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, (byte) 0x90, 0x00, (byte) 0x41});
+            // write sensivity block 2 to register 0xb0001a
+            this.writeRegister(new byte[]{(byte) 0xb0, 0x00, (byte) 0x1a}, new byte[]{0x40, 0x00});
 
-        // write sensivity block 2 to register 0xb0001a
-        this.writeRegister(new byte[]{(byte) 0xb0, 0x00, (byte) 0x1a}, new byte[]{0x40, 0x00});
+            // write ir-mode to register 0xb00033
+            this.writeRegister(new byte[]{(byte) 0xb0, 0x00, 0x33}, new byte[]{infraredMode});
+        } else {
+            Log.write("Disabling INFRARED CAMERA...");
+            this.infraredEnabled = false;
+        }
 
-        // write ir-mode to register 0xb00033
-        this.writeRegister(new byte[]{(byte) 0xb0, 0x00, 0x33}, new byte[]{infraredMode});
-
-        // enable continuous acceleration and IR cam on channel 33
-        //this.sendRaw(new byte[]{CMD_SET_REPORT, 0x12, 0x00, 0x33});
+        // change channel dynamically
+        this.updateReportChannel();
     }
 
     /**
@@ -411,22 +471,21 @@ public class Wiimote extends Device {
      *
      * @throws java.io.IOException
      */
-    public void enableWiiMotionPlus() throws IOException {
+    public void setWiiMotionPlusEnabled(boolean enabled) throws IOException {
+        if(enabled) {
+            Log.write("Enabling WII MOTION PLUS..");
+            this.wiiMotionPlusEnabled = true;
+            // write 0x04 to 0x04a600fe to get wii m+ data within extension reports
+            this.writeRegister(new byte[]{(byte) 0xa6, 0x00, (byte) 0xfe}, new byte[]{0x04});
+        } else {
+            Log.write("Disabling WII MOTION PLUS..");
+            this.wiiMotionPlusEnabled = false;
+        }
 
-        Log.write("Enabling WII MOTION PLUS..");
-
-        // write 0x04 to 0x04a600fe to get wii m+ data within extension reports
-        this.writeRegister(new byte[]{(byte) 0xa6, 0x00, (byte) 0xfe}, new byte[]{0x04});
-
-        // enable extension byte containing channel 37
-        this.sendRaw(new byte[]{CMD_SET_REPORT, 0x12, 0x00, 0x37});
+        // change channel dynamically
+        this.updateReportChannel();
     }
-
-    public void enableInfraredAndWiiMotionPlus() throws IOException {        
-        this.enableInfraredCamera((byte)0x01); // 10 bytes
-        this.enableWiiMotionPlus();
-        this.sendRaw(new byte[]{CMD_SET_REPORT, 0x12, 0x00, 0x37});
-    }
+    
 
     /**
      * With this method you gain access over the vibrate function of
@@ -448,10 +507,6 @@ public class Wiimote extends Device {
         } catch (InterruptedException e) {
             System.out.println("WiiMoteThread interrupted.");
         }
-    }
-
-    public boolean infraredEnabled() {
-        return this.infraredenabled;
     }
 
     public double getPitch() {
