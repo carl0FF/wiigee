@@ -205,8 +205,8 @@ public class Device {
 
     /** Fires a button released event.
      */
-    public void fireButtonReleasedEvent() {
-        ButtonReleasedEvent w = new ButtonReleasedEvent(this);
+    public void fireButtonReleasedEvent(int button) {
+        ButtonReleasedEvent w = new ButtonReleasedEvent(this, button);
         for (int i = 0; i < this.buttonlistener.size(); i++) {
             this.buttonlistener.get(i).buttonReleaseReceived(w);
         }

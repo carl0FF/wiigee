@@ -29,8 +29,6 @@ import java.util.EventObject;
 import java.util.Vector;
 import javax.bluetooth.L2CAPConnection;
 
-import org.wiigee.event.ButtonPressedEvent;
-import org.wiigee.event.ButtonReleasedEvent;
 import org.wiigee.util.Log;
 
 /**
@@ -43,6 +41,7 @@ import org.wiigee.util.Log;
 public class WiimoteStreamer extends Thread {
 
     private boolean running;
+    private int buttonstate;
     private double x0, x1, y0, y1, z0, z1;
     private double psi0, theta0, phi0;
     private boolean wmpcalibrated;
@@ -55,10 +54,13 @@ public class WiimoteStreamer extends Thread {
     protected WiimoteStreamer(Wiimote wiimote) {
         this.wiimote = wiimote;
         this.receiveCon = wiimote.getReceiveConnection();
+        this.buttonstate = 0;
+        Log.write("WiimoteStreamer initialized...");
     }
 
     @Override
     public void run() {
+        Log.write("WiimoteStreamer running...");
         this.running = true;
         this.calibrationcounter = 0;
         this.calibrationsequence = new Vector<double[]>();
@@ -79,12 +81,12 @@ public class WiimoteStreamer extends Thread {
 
 
                 if((b[1] & 0xFF) == 0x31) {
-                    this.handleButtonData(b[2], b[3]);
+                    this.handleButtonData(new byte[] { b[2], b[3] });
                     this.handleAccelerationData(new byte[] { b[4], b[5], b[6] });
                     //Log.write("0x31: Button + Acc");
                 }
                 else if ((b[1] & 0xFF) == 0x33) {
-                    this.handleButtonData(b[2], b[3]);
+                    this.handleButtonData(new byte[] { b[2], b[3] });
                     this.handleAccelerationData(new byte[]{b[4], b[5], b[6]});
                     this.handleInfraredData(new byte[]{b[7], b[8], b[9],
                                             b[10], b[11], b[12],
@@ -93,7 +95,7 @@ public class WiimoteStreamer extends Thread {
                     //Log.write("0x33: Button + Acc + Irda");
                 }
                 else if ((b[1] & 0xFF) == 0x37) {
-                    this.handleButtonData(b[2], b[3]);
+                    this.handleButtonData(new byte[] { b[2], b[3] });
                     this.handleAccelerationData(new byte[]{b[4], b[5], b[6]});
                     this.handleInfraredData(
                             new byte[]{b[7], b[8], b[9], b[10], b[11], b[12],
@@ -103,7 +105,7 @@ public class WiimoteStreamer extends Thread {
                     //Log.write("0x37: Button + Acc + Ext");
                 }
                 else if ((b[1] & 0xFF) == 0x21) {
-                    this.handleButtonData(b[2], b[3]);
+                    this.handleButtonData(new byte[] { b[2], b[3] });
 
                     // calibration data
                     if (((b[5] & 0xFF) == 0x00) && ((b[6] & 0xFF) == 0x20)) {
@@ -312,74 +314,28 @@ public class WiimoteStreamer extends Thread {
      * @param a First button byte.
      * @param b Second button byte.
      */
-    private void handleButtonData(byte a, byte b) {
-        // Button 1 matches button "2" on wiimote
-        if (((b & 0xFF) & 0x01) == 0x01 && !(this.lastevent instanceof ButtonPressedEvent)) {
-            this.wiimote.fireButtonPressedEvent(1);
-            this.lastevent = new ButtonPressedEvent(
-                    this.wiimote, 1);
-        } // Button 2 matches button "1" on wiimote
-        else if (((b & 0xFF) & 0x02) == 0x02 && !(this.lastevent instanceof ButtonPressedEvent)) {
-            this.wiimote.fireButtonPressedEvent(2);
-            this.lastevent = new ButtonPressedEvent(
-                    this.wiimote, 2);
-        } // Button 3 matches button "B" on wiimote
-        else if (((b & 0xFF) & 0x04) == 0x04 && !(this.lastevent instanceof ButtonPressedEvent)) {
-            this.wiimote.fireButtonPressedEvent(3);
-            this.lastevent = new ButtonPressedEvent(
-                    this.wiimote, 3);
-        } // Button 4 matches button "A" on wiimote
-        else if (((b & 0xFF) & 0x08) == 0x08 && !(this.lastevent instanceof ButtonPressedEvent)) {
-            this.wiimote.fireButtonPressedEvent(4);
-            this.lastevent = new ButtonPressedEvent(
-                    this.wiimote, 4);
-        } // Button 5 matches button "MINUS" on wiimote
-        else if (((b & 0xFF) & 0x10) == 0x10 && !(this.lastevent instanceof ButtonPressedEvent)) {
-            this.wiimote.fireButtonPressedEvent(5);
-            this.lastevent = new ButtonPressedEvent(
-                    this.wiimote, 5);
-        } // Button 6 unknown
-        // Button 7 unknown
-        // Button 8 matches button "HOME" on wiimote
-        else if (((b & 0xFF) & 0x80) == 0x80 && !(this.lastevent instanceof ButtonPressedEvent)) {
-            this.wiimote.fireButtonPressedEvent(8);
-            this.lastevent = new ButtonPressedEvent(
-                    this.wiimote, 8);
-        } // Button 9 matches "CROSS LEFT" on wiimote
-        else if (((a & 0xFF) & 0x01) == 0x01 && !(this.lastevent instanceof ButtonPressedEvent)) {
-            this.wiimote.fireButtonPressedEvent(9);
-            this.lastevent = new ButtonPressedEvent(
-                    this.wiimote, 9);
-        } // Button 10 matches "CROSS RIGHT" on wiimote
-        else if (((a & 0xFF) & 0x02) == 0x02 && !(this.lastevent instanceof ButtonPressedEvent)) {
-            this.wiimote.fireButtonPressedEvent(10);
-            this.lastevent = new ButtonPressedEvent(
-                    this.wiimote, 10);
-        } // Button 11 matches "CROSS DOWN" on wiimote
-        else if (((a & 0xFF) & 0x04) == 0x04 && !(this.lastevent instanceof ButtonPressedEvent)) {
-            this.wiimote.fireButtonPressedEvent(11);
-            this.lastevent = new ButtonPressedEvent(
-                    this.wiimote, 11);
-        } // Button 12 matches "CROSS UP" on wiimote
-        else if (((a & 0xFF) & 0x08) == 0x08 && !(this.lastevent instanceof ButtonPressedEvent)) {
-            this.wiimote.fireButtonPressedEvent(12);
-            this.lastevent = new ButtonPressedEvent(
-                    this.wiimote, 12);
-        } // Button 13 matches button "PLUS" on wiimote
-        else if (((a & 0xFF) & 0x10) == 0x10 && !(this.lastevent instanceof ButtonPressedEvent)) {
-            this.wiimote.fireButtonPressedEvent(13);
-            this.lastevent = new ButtonPressedEvent(
-                    this.wiimote, 13);
-        } // Button 14 unknown
-        // Button 15 unknown
-        // Button 16 unknown
-        // Button release
-        else if ((((a & 0xFF) == 0x20) || ((a & 0xFF) == 0x40) || ((a & 0xFF) == 0x60)) &&
-                (((b & 0xFF) == 0x20) || ((b & 0xFF) == 0x40) || ((b & 0xFF) == 0x60)) &&
-                !(this.lastevent instanceof ButtonReleasedEvent)) {
-            this.wiimote.fireButtonReleasedEvent();
-            this.lastevent = new ButtonReleasedEvent(this.wiimote);
+    private void handleButtonData(byte[] data) {
+        byte first = (byte)(data[0] & 0xFF);
+        byte second = (byte)(data[1] & 0xFF);
+        int newbuttons = (first<<8) + second;
+
+        int delta = this.buttonstate ^ newbuttons; // XOR
+
+        int shift = 0x0001;
+        while(shift<0x1000) {
+            if(shift!=0x0020 && shift!=0x0040) { // reserved bytes
+                if((delta&shift)==shift) { // change detected
+                    if((newbuttons&shift)==shift) { // press detected
+                        this.wiimote.fireButtonPressedEvent(shift);
+                    } else { // release detected
+                        this.wiimote.fireButtonReleasedEvent(shift);
+                    }
+                }
+            }
+            shift<<=1;
         }
+
+        this.buttonstate = newbuttons;
     }
 
     /**

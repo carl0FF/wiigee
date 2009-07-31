@@ -41,17 +41,17 @@ import org.wiigee.util.Log;
 public class Wiimote extends Device {
 
     // Fixed number values.
-    public static final int BUTTON_2 = 1;
-    public static final int BUTTON_1 = 2;
-    public static final int BUTTON_B = 3;
-    public static final int BUTTON_A = 4;
-    public static final int BUTTON_MINUS = 5;
-    public static final int BUTTON_HOME = 8;
-    public static final int BUTTON_LEFT = 9;
-    public static final int BUTTON_RIGHT = 10;
-    public static final int BUTTON_DOWN = 11;
-    public static final int BUTTON_UP = 12;
-    public static final int BUTTON_PLUS = 13;
+    public static final int BUTTON_2 = 0x0001;
+    public static final int BUTTON_1 = 0x0002;
+    public static final int BUTTON_B = 0x0004;
+    public static final int BUTTON_A = 0x0008;
+    public static final int BUTTON_MINUS = 0x0010;
+    public static final int BUTTON_HOME = 0x0080;
+    public static final int BUTTON_LEFT = 0x0100;
+    public static final int BUTTON_RIGHT = 0x0200;
+    public static final int BUTTON_DOWN = 0x0400;
+    public static final int BUTTON_UP = 0x0800;
+    public static final int BUTTON_PLUS = 0x1000;
 
     // Reports
     public static final byte CMD_SET_REPORT = 0x52;
@@ -370,6 +370,7 @@ public class Wiimote extends Device {
         }
         else {
             // default channel - fallback to button only.
+            Log.write("Invalid Value Configuration: Fallback to Buttons only.");
             this.sendRaw(new byte[]{CMD_SET_REPORT, 0x12, 0x00, 0x30});
         }
     }

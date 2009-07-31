@@ -33,25 +33,6 @@ import org.wiigee.device.*;
  * representation of which button has been pressed. Please note that
  * there exist enumeration constants in the class, so you don't
  * have to use this integer values directly.
- * 
- * Button 1 matches button "2" on wiimote
- * Button 2 matches button "1" on wiimote
- * Button 3 matches button "B" on wiimote
- * Button 4 matches button "A" on wiimote
- * Button 5 matches button "MINUS" on wiimote
- * Button 6 unknown
- * Button 7 unknown
- * Button 8 matches button "HOME" on wiimote
- * Button 9 matches "CROSS LEFT" on wiimote
- * Button 10 matches "CROSS RIGHT" on wiimote
- * Button 11 matches "CROSS DOWN" on wiimote
- * Button 12 matches "CROSS UP" on wiimote
- * Button 13 matches button "PLUS" on wiimote
- * Button 14 unknown
- * Button 15 unknown
- * Button 16 unknown
- *
- * There can be other interpretations of buttons for other devices.
  *
  * @author Benjamin 'BePo' Poppinga
  */
