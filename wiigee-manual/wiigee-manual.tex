@@ -86,14 +86,14 @@ Integrating wiigee into your Java project is easy. After wiigee's JAR file and a
 \subsection{Create a new Java Project}
 Choose \textbf{File} and select \textbf{New Project}. Then select that a \textbf{Java Application} should be created and click \textbf{Next}.
 
-\begin{figure}[h]
+\begin{figure}[h!]
 \centering
 \includegraphics[width=0.95\linewidth]{img/setup/netbeans/step1.png}
 \end{figure}
 
 Choose a \textbf{Project Name} like "`wiigee-test"', select \textbf{Use Dedicated Folder for Storing Libraries} and click \textbf{Finish}. Remember the folder where you create your new project.
 
-\begin{figure}[h]
+\begin{figure}[h!]
 \centering
 \includegraphics[width=0.95\linewidth]{img/setup/netbeans/step2.png}
 \end{figure}
@@ -101,39 +101,55 @@ Choose a \textbf{Project Name} like "`wiigee-test"', select \textbf{Use Dedicate
 \subsection{Integrate wiigee}
 Right click on your project name on the left and select \textbf{Properties}. Then select \textbf{Libraries} and click \textbf{Add JAR/Folder}, since multiple JAR files should be added.
 
-\begin{figure}[h]
+\begin{figure}[h!]
 \centering
 \includegraphics[width=0.95\linewidth]{img/setup/netbeans/step3.png}
 \end{figure}
 
-In the popping up file selector, \textbf{change to the path} where you've downloaded wiigee, a wiigee plugin and your JSR 82 implementation. \textbf{Select} the JAR file and select \textbf{Copy to Libraries Folder}. This allows you to delete the downloaded files afterwards, since a copy of them now exists within your project folder. Finally click \textbf{Open}. Repeat this procedure for every JAR file or select multiple libraries at once.
+In the popping up file selector, \textbf{change to the path} where you've downloaded wiigee, a wiigee plugin and your JSR 82 implementation. \textbf{Select} the JAR file and select \textbf{Copy to Libraries Folder}. This allows you to delete the downloaded files afterwards, since a copy of them now exists within your project folder. Finally click \textbf{Open}. Repeat this procedure for every JAR file or select multiple libraries at once. wiigee is now known to your project and can be used.
 
-\begin{figure}[h]
+\begin{figure}[h!]
 \centering
 \includegraphics[width=0.95\linewidth]{img/setup/netbeans/step4.png}
 \end{figure}
 
-
-
 \subsection{Implement GestureListener}
-\subsection{Run Application}
+To get information about recognized gestures, the \texttt{GestureListener} has to be implemented by at least one class. To do so, create a new Java class, for example named \texttt{GestureRetriever}. To implement the \texttt{GestureListener} add it to the class descriptor as shown in Figure \ref{fig:implement_gesturelistener}. Finally implement the defined method \texttt{gestureReceived} within this class. There you can do the actual gesture handling. This is the method which would be called in case a gesture has been recognized. As example the determined Gesture ID is simply printed out for each gesture.
 
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.95\linewidth]{img/setup/netbeans/step4.png}
+\label{fig:implement_gesturelistener}
+\caption{TODO}
+\end{figure}
 
 \section{Eclipse 3.X}
-
+TODO
 
 \chapter{Using wiigee}
-\section{Settings}
+After wiigee is set up and an application is implemented according to the previous chapter, the library can be trained with a set of gestures. The training has to be done after wiigee has started. There exist two methods for training gestures: performing the gestures while the application is running or loading pretrained gestures during startup of the application from a file.
+
+\section{Training of Gestures}
+To train a gesture during the runtime of the application press and hold the training button, which in case of the wiimote is \textbf{A}. While holding the button perform the indented gesture. When finished release the button and repeat this training procedure for at least five times to increase the recognition reliability. Finally press the gesture conclusion button to conclude this type of a gesture. In case of the Wiimote this button is \textbf{Home}. The whole procedure needs to be repeated for every gesture type which should be trained.
+
+\section{Recognition of Gestures}
+To recognize a gesture some gestures already has to be trained. Start the recognition process by pressing down and holding the recognition button. In case of the Wiimote the recognition button would be the button \textbf{B}. If a gesture has been recognized, every \texttt{GestureListener} would be called immediatly.
+
+\section{Save a Gestureset}
+It is possible to save a set of trained gestures by calling the \textit{saveGestures} of the Device instance after the gestures has been trained. The resulting files are a WGS (wiigee gesture set) file and a TXT file for each gesture type belonging to this gesture set.
+
+\section{Load a Gestureset}
+Instead of training gestures dynamically everytime the application starts, already trained gestures can be saved to a file and trained again without any user interaction. To load a set of gestures call the \textit{loadGestures} method a Device instance with the according path to a WGS file, which has been saved by wiigee.
+
+
+
+
+\chapter{Settings}
 \subsection{Button Events}
-
 \subsection{Acceleration}
-% Filter
-
 \subsection{Rotation}
-% Filter
-
 \subsection{Infrared}
-% Mouse Control
+
 
 \chapter{Example: Gesture Controlled Photo Slideshow}
 Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum.
