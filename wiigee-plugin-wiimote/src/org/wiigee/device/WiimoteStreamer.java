@@ -322,7 +322,7 @@ public class WiimoteStreamer extends Thread {
         int delta = this.buttonstate ^ newbuttons; // XOR
 
         int shift = 0x0001;
-        while(shift<0x1000) {
+        while(shift<=0x1000) {
             if(shift!=0x0020 && shift!=0x0040) { // reserved bytes
                 if((delta&shift)==shift) { // change detected
                     if((newbuttons&shift)==shift) { // press detected
