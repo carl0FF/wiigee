@@ -19,7 +19,7 @@ Accelerometerbased\\
 {\small Benjamin Poppinga}\\
 {\footnotesize benjamin@wiigee.org}\\
 \vspace{1cm}
-Version 1.0\\
+Version 1.0 \textbf{DRAFT}\\
 \today
 \vspace{3.0cm}
 \end{center}
