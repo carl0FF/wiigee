@@ -353,14 +353,14 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="1" attributes="0">
                           <Component id="graphPanel1" max="32767" attributes="0"/>
-                          <Component id="consoleScrollPane" alignment="0" pref="439" max="32767" attributes="0"/>
-                          <Component id="gestureField" alignment="1" pref="439" max="32767" attributes="0"/>
+                          <Component id="consoleScrollPane" alignment="0" pref="471" max="32767" attributes="0"/>
+                          <Component id="gestureField" alignment="1" pref="471" max="32767" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
-                              <Component id="inMotionField" pref="146" max="32767" attributes="0"/>
+                              <Component id="inMotionField" pref="159" max="32767" attributes="0"/>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
-                              <Component id="recognitionField" pref="150" max="32767" attributes="0"/>
+                              <Component id="recognitionField" pref="163" max="32767" attributes="0"/>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
-                              <Component id="trainingField" pref="123" max="32767" attributes="0"/>
+                              <Component id="trainingField" pref="137" max="32767" attributes="0"/>
                           </Group>
                           <Component id="accelerationLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
@@ -412,7 +412,7 @@
                 </DimensionLayout>
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <EmptySpace min="0" pref="712" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="726" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
               </Layout>
@@ -432,12 +432,12 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <EmptySpace min="0" pref="437" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="469" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <EmptySpace min="0" pref="241" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="263" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
               </Layout>
@@ -600,7 +600,7 @@
                               </Group>
                           </Group>
                       </Group>
-                      <EmptySpace pref="333" max="32767" attributes="0"/>
+                      <EmptySpace pref="355" max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="1" attributes="0">
                           <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel8" min="-2" max="-2" attributes="0"/>
@@ -652,7 +652,7 @@
                               </Group>
                           </Group>
                       </Group>
-                      <EmptySpace pref="619" max="32767" attributes="0"/>
+                      <EmptySpace pref="618" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>

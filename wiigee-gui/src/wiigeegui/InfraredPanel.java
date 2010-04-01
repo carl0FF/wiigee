@@ -23,11 +23,8 @@
  */
 package wiigeegui;
 
-import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JPanel;
 import java.awt.Graphics;
 import java.awt.Robot;
