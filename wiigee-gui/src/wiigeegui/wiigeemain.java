@@ -5,6 +5,8 @@
 
 package wiigeegui;
 
+import org.wiigee.util.Log;
+
 /**
  *
  * @author bepo
@@ -19,7 +21,8 @@ public class wiigeemain {
     public static void main(String args[]) {
         // setup wiimote
         // manually connect
-        try {            
+        try {
+            Log.setLevel(Log.NORMAL);
             frontend = new Frontend();
 
             // show gui
