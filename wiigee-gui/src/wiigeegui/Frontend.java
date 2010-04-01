@@ -95,12 +95,11 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
             this.getGestureMeaningDialog.setVisible(true);
         }
 
+        // hardcoded filter reset buttons
         if(event.getButton()==Wiimote.BUTTON_MINUS) {
             Log.write("ACC FILTER RESET!");
             this.wiimote.resetAccelerationFilters();
-        }
-
-        if(event.getButton()==Wiimote.BUTTON_PLUS) {
+        } else if(event.getButton()==Wiimote.BUTTON_PLUS) {
             Log.write("ROT FILTER RESET!");
             this.wiimote.resetRotationFilters();
         }
@@ -139,12 +138,12 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
     private void setupWiimote() {
         try {
             this.wiimote.setAccelerationEnabled(true);
-            //this.wiimote.setInfraredCameraEnabled(true);
-            //this.wiimote.setWiiMotionPlusEnabled(true);
+            // this.wiimote.setInfraredCameraEnabled(true);
+            // this.wiimote.setWiiMotionPlusEnabled(true);
             this.wiimote.addAccelerationFilter(new HighPassFilter());
             this.wiimote.addRotationFilter(new RotationThresholdFilter(0.5));
         } catch(Exception e) {
-                Log.write("Grosser Mist: setupWiimote()");
+                Log.write("Error in: setupWiimote()");
                 e.printStackTrace();
         }
 
@@ -287,7 +286,6 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
         scanWiimoteDialog.setEnabled(false);
         scanWiimoteDialog.setModal(true);
         scanWiimoteDialog.setName("scanWiimote"); // NOI18N
-        scanWiimoteDialog.setResizable(false);
         scanWiimoteDialog.setUndecorated(true);
 
         scanWiimoteStatusLabel.setText("Please press Button A and B on the Wiimote...");
@@ -324,7 +322,6 @@ public class Frontend extends javax.swing.JFrame implements GestureListener,
         );
 
         getGestureMeaningDialog.setModal(true);
-        getGestureMeaningDialog.setResizable(false);
 
         jLabel2.setText("Please enter the meaning of the trained gesture:");
 
