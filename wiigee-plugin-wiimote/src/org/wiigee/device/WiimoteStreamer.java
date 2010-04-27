@@ -94,6 +94,13 @@ public class WiimoteStreamer extends Thread {
                                             b[16], b[17], b[18]});
                     //Log.write("0x33: Button + Acc + Irda");
                 }
+                else if ((b[1] & 0xFF) == 0x35) {
+                    this.handleButtonData(new byte[] { b[2], b[3] });
+                    this.handleAccelerationData(new byte[]{b[4], b[5], b[6]});
+                    this.handleWiiMotionPlusData(
+                            new byte[]{b[7], b[8], b[9], b[10], b[11], b[12]});
+                    //Log.write("0x35: Button + Acc + Ext");
+                }
                 else if ((b[1] & 0xFF) == 0x37) {
                     this.handleButtonData(new byte[] { b[2], b[3] });
                     this.handleAccelerationData(new byte[]{b[4], b[5], b[6]});
@@ -197,6 +204,11 @@ public class WiimoteStreamer extends Thread {
         int thetaU = ((data[4] & 0xFC) << 6);
         int phiU = ((data[5] & 0xFC) << 6);
 
+        // get speed indicators
+        boolean psiHighSpeed = ((data[3] & 0x02) >> 1) == 0;
+        boolean phiHighSpeed = (data[3] & 0x01) == 0;
+        boolean thetaHighSpeed = ((data[4] & 0x02) >> 1) == 0;
+
         // add the two values
         int psiRAW = psiU + psiL;
         int thetaRAW = thetaU + thetaL;
@@ -211,9 +223,27 @@ public class WiimoteStreamer extends Thread {
             }
         } else { // is calibrated
             // calculate degrees per second movement
-            double psi = (double) (psiRAW - psi0) / 20.0;
-            double theta = (double) (thetaRAW - theta0) / 20.0;
-            double phi = (double) (phiRAW - phi0) / 20.0;
+            double psi = 0.0;
+            double theta = 0.0;
+            double phi = 0.0;
+
+            if(psiHighSpeed) {
+                psi = (double) (psiRAW - psi0) / 4.0;
+            } else {
+                psi = (double) (psiRAW - psi0) / 20.0;
+            }
+
+            if(thetaHighSpeed) {
+                theta = (double) (thetaRAW - theta0) / 4.0;
+            } else {
+                theta = (double) (thetaRAW - theta0) / 20.0;
+            }
+
+            if(phiHighSpeed) {
+                phi = (double) (phiRAW - phi0) / 4.0;
+            } else {
+                phi = (double) (phiRAW - phi0) / 20.0;
+            }
 
             this.wiimote.fireRotationSpeedEvent(new double[]{-psi, -theta, -phi});
         }
