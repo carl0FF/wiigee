@@ -23,6 +23,7 @@
  */
 package org.wiigee.control;
 
+import android.content.Context;
 import org.wiigee.device.AndroidDevice;
 import org.wiigee.event.GestureListener;
 import org.wiigee.filter.Filter;
@@ -42,17 +43,17 @@ import org.wiigee.util.Log;
 public class AndroidWiigee extends Wiigee {
 
     // Version information
-    protected static String pluginversion = "1.0.1 alpha";
-    protected static String pluginreleasedate = "20090625";
+    protected static String pluginversion = "1.0.3 alpha - untested!";
+    protected static String pluginreleasedate = "20101011";
 
     // Device
     private AndroidDevice device;
 
     
-    public AndroidWiigee() {
+    public AndroidWiigee(Context context) {
         super();
         Log.write("This is wiigee-plugin-android (Andgee) version "+pluginversion+" ("+pluginreleasedate+")");
-        device = new AndroidDevice();
+        device = new AndroidDevice(context);
     }
 
     public void addGestureListener(GestureListener listener) {

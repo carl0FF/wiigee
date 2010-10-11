@@ -24,6 +24,7 @@
 
 package org.wiigee.device;
 
+import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -42,8 +43,9 @@ import android.hardware.SensorManager;
 public class AndroidDevice extends Device implements SensorEventListener {
 
     private float x0, y0, z0, x1, y1, z1;
+    private SensorManager sensorManager;
 
-    public AndroidDevice() {
+    public AndroidDevice(Context context) {
         super(true);
         // 'Calibrate' values
         this.x0 = 0;
@@ -53,13 +55,26 @@ public class AndroidDevice extends Device implements SensorEventListener {
         this.y1 = 0;
         this.z1 = SensorManager.STANDARD_GRAVITY;
 
+        // request acceleration updates
+        this.sensorManager = (SensorManager)
+                context.getSystemService(Context.SENSOR_SERVICE);
+        Sensor accSensor = this.sensorManager.
+                getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        this.sensorManager.
+                registerListener(this, accSensor,
+                SensorManager.SENSOR_DELAY_UI);
+    }
+
+    public void close() {
+        if(this.sensorManager!=null)
+            this.sensorManager.unregisterListener(this);
     }
 
     public void onSensorChanged(SensorEvent sevent) {
         Sensor sensor = sevent.sensor;
         float[] values = sevent.values;
 
-        if (this.accelerationEnabled() && sensor.getType() == SensorManager.SENSOR_ACCELEROMETER) {
+        if (this.accelerationEnabled && sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
 
             double x, y, z;
             float xraw, yraw, zraw;
