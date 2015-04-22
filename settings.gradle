@@ -1,0 +1,1 @@
+include ':wiigee-lib', ':wiigee-gui', ':wiigee-plugin-android', ':wiigee-plugin-wiimote', ':wiigee-manual'

@@ -1,0 +1,6 @@
+apply plugin: 'java'
+
+dependencies {
+    compile project(':wiigee-lib')
+    compile ("net.sf.bluecove:bluecove:2.1.0")
+}
